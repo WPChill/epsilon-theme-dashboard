@@ -1,0 +1,17 @@
+.epsilon-dashboard-tab {
+  padding: 20px 0;
+  display: none;
+  &.active {
+    display: block;
+  }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    .col {
+      flex: 1;
+      min-width: 33%;
+    }
+  }
+}
