@@ -1,0 +1,53 @@
+#epsilon-demo.epsilon-dashboard-tab .row {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  justify-content: initial;
+  flex-wrap: initial;
+  .epsilon-demo-box {
+    text-align: center;
+    display: inline-block;
+    &.col {
+      display: inline-block;
+      min-width: initial;
+      width: 155px;
+      margin-right: 20px;
+    }
+    img {
+      display: block;
+    }
+
+    .epsilon-demo-title {
+      background: #888888;
+      color: #fff;
+      display: block;
+      width: 100%;
+      padding: 5px;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
+    ul {
+      position: absolute;
+      top: 0;
+      right: -200px;
+      margin: 0;
+      .onoffswitch {
+        margin-left: 50px;
+      }
+    }
+  }
+}
+
+.demo-complete-item {
+  transition: all 1s;
+  position: relative;
+}
+
+.demo-complete-enter, .demo-complete-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.demo-complete-leave-active {
+  position: absolute;
+}

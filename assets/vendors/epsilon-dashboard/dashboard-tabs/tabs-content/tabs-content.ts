@@ -31,7 +31,7 @@ export const dashboardTabsContent: any = Vue.extend( {
           
             <template v-if="tab.type === 'info'">
               <div class="row">
-                  <div class="col" v-for="col in tab.content">
+                  <div class="col" v-for="col in tab.content" :class="{ standout: col.type === 'standout' }">
                       <h3>{{ col.title }}</h3>
                       <p v-html="col.paragraph"></p>
                       <p v-html="col.action"></p>
@@ -41,6 +41,12 @@ export const dashboardTabsContent: any = Vue.extend( {
             
             <template v-else-if="tab.type === 'actions'">
                 <recommended-actions></recommended-actions>
+            </template>
+            
+            <template v-else-if="tab.type === 'demos'">
+              <h3>{{ tab.content.title }}</h3>
+              <p v-html="tab.content.paragraph"></p>
+              <demos :path="tab.content.demos"></demos>
             </template>
           </div>
         </template>
