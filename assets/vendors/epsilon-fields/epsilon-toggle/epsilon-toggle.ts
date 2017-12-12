@@ -15,18 +15,35 @@ export const epsilonToggle: any = Vue.extend( {
   /**
    * Accepted props
    */
-  props: [ 'compId', 'compLabel' ],
+  props: [ 'compId', 'compLabel', 'parentIndex' ],
+  /**
+   * Model
+   * @returns {{active: boolean}}
+   */
+  data: function() {
+    return {
+      active: true,
+    };
+  },
+  methods: {
+    sendCheckboxChange: function() {
+      this.$nextTick( function() {
+        this.$root.$emit( 'changed-epsilon-toggle', { id: this.compId, status: this.active, parentIndex: this.parentIndex } );
+      } );
+    }
+  },
   /**
    * Component template
    */
   template: `
 		<div class="checkbox_switch">
-		  {{ compLabel }}
       <div class="onoffswitch">
-        <input type="checkbox" :id="'epsilon-' + compId" :name="'epsilon-' + compId" class="onoffswitch-checkbox" value="on">
+        <input type="checkbox" v-on:input="sendCheckboxChange" :id="'epsilon-' + compId" :name="'epsilon-' + compId" v-model="active" class="onoffswitch-checkbox" :checked="active">
         <label class="onoffswitch-label" :for="'epsilon-' + compId"></label>
       </div>
+      {{ compLabel }}
 		</div>
   `,
+
 } );
 Vue.component( 'epsilon-toggle', epsilonToggle );

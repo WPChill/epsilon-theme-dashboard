@@ -110,7 +110,17 @@ class Epsilon_Dashboard_Output {
 			/* Translators: Dashboard Header Intro. */
 			'intro'        => sprintf( esc_html__( '%1$s is now installed and ready to use! Get ready to build something beautiful. We hope you enjoy it! We want to make sure you have the best experience using %1$s and that is why we gathered here all the necessary information for you. We hope you will enjoy using %1$s, as much as we enjoy creating great products.', 'epsilon-framework' ), esc_html( $this->theme['theme-name'] ) ),
 			'translations' => array(
-				'import' => esc_html__( 'Import', 'epsilon-framework' ),
+				'select'          => esc_html__( 'Select', 'epsilon-framework' ),
+				'import'          => esc_html__( 'Import', 'epsilon-framework' ),
+				'cancel'          => esc_html__( 'Cancel', 'epsilon-framework' ),
+				'selectImport'    => esc_html__( 'Select what you want to install', 'epsilon-framework' ),
+				'waitImport'      => esc_html__( 'Please wait while we’re installing!', 'epsilon-framework' ),
+				'contentImported' => esc_html__( 'Content imported!', 'epsilon-framework' ),
+				'waiting'         => esc_html__( 'Waiting', 'epsilon-framework' ),
+				'installing'      => esc_html__( 'Installing', 'epsilon-framework' ),
+				'activating'      => esc_html__( 'Activating', 'epsilon-framework' ),
+				'completePlugin'  => esc_html__( 'Installed and Activated', 'epsilon-framework' ),
+				'pluginsFinished' => esc_html__( 'Plugins installed', 'epsilon-framework' ),
 			),
 			'actions'      => $this->actions,
 			'tabs'         => array(

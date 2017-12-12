@@ -74,7 +74,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
             args: {
               action: [ 'Epsilon_Dashboard_Helper', 'create_plugin_activation_link' ],
               nonce: EpsilonDashboard.ajax_nonce,
-              args: { slug: 'contact-form-7' },
+              args: { slug: this.actions[ actionIndex ].plugin_slug },
             },
           };
 
@@ -95,7 +95,6 @@ export const dashboardRecommendedActions: any = Vue.extend( {
           }
         } );
       }
-
     },
     /**
      * Handles plugin installation

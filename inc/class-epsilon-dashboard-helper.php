@@ -99,19 +99,21 @@ class Epsilon_Dashboard_Helper {
 			)
 		);
 
+		$importer->set_demos();
+
 		/**
 		 * In case the json could not be decoded, we return a new stdClass
 		 */
 		if ( null === $importer ) {
 			return array(
 				'status' => 'nok',
-				'demos'  => $importer->handle_json(),
+				'demos'  => $importer->demos_js,
 			);
 		}
 
 		return array(
 			'status' => 'ok',
-			'demos'  => $importer->handle_json(),
+			'demos'  => $importer->demos_js,
 		);
 	}
 }
