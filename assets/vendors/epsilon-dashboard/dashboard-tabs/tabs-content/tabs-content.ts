@@ -15,14 +15,28 @@ export const dashboardTabsContent: any = Vue.extend( {
   name: 'dashboard-tabs-content',
   /**
    * Model
-   * @returns {{currentTab: null}}
    */
   data: function() {
     return {
-      currentTab: this.$store.state.tabs[ 0 ].id,
       tabs: this.$store.state.tabs,
-      demos: true,
+
     };
+  },
+  computed: {
+    /**
+     * Computed properties
+     * @returns {any}
+     */
+    activeTab: function() {
+      return this.$store.getters.getActiveTab;
+    },
+    /**
+     * Gets import state
+     * @returns {(state: any) => any}
+     */
+    importedDemo: function() {
+      return this.$store.getters.getImportStatus;
+    },
   },
   /**
    * Component template
@@ -30,7 +44,7 @@ export const dashboardTabsContent: any = Vue.extend( {
   template: `
       <div>
         <template v-for="(tab, index) in tabs">
-          <div class="epsilon-dashboard-tab" :class="{ active: currentTab === tab.id }" :id="tab.id" :key="tab.id">
+          <div class="epsilon-dashboard-tab" :class="{ active: activeTab === index }" :id="tab.id" :key="index">
           
             <template v-if="tab.type === 'info'">
               <div class="row">
@@ -39,7 +53,7 @@ export const dashboardTabsContent: any = Vue.extend( {
                       <p v-html="col.paragraph"></p>
                       <p v-html="col.action"></p>
                   </div>
-              </div>        
+              </div>
             </template>
             
             <template v-else-if="tab.type === 'actions'">
@@ -47,7 +61,7 @@ export const dashboardTabsContent: any = Vue.extend( {
             </template>
             
             <template v-else-if="tab.type === 'demos'">
-              <h3 v-if="demos">{{ tab.content.title }}</h3>
+              <h3 v-if="!importedDemo">{{ tab.content.title }}</h3>
               <h3 v-else>{{ tab.content.titleAlternate }}</h3>
               
               <p v-html="tab.content.paragraph"></p>
@@ -57,64 +71,5 @@ export const dashboardTabsContent: any = Vue.extend( {
         </template>
       </div>
   `,
-  /**
-   * Methods
-   */
-  methods: {
-    /**
-     * Change the active tab
-     * @param {string} id
-     */
-    changeTab: function( id: string ): void {
-      this.currentTab = id;
-    },
-    /**
-     * Set imported flag, if silent is true - we no longer do the ajax request
-     * @param {boolean} silent
-     */
-    setImportedFlag: function( silent = false ) {
-      const self = this;
-      if ( silent ) {
-        this.demos = false;
-        return;
-      }
-
-      let temp: any = {};
-      temp[ this.$store.state.theme[ 'theme-slug' ] + '_content_imported' ] = true;
-
-      let fetchObj: EpsilonFetchTranslator,
-          data = {
-            action: 'epsilon_dashboard_ajax_callback',
-            nonce: this.$store.state.ajax_nonce,
-            args: {
-              action: [ 'Epsilon_Dashboard_Helper', 'set_options' ],
-              nonce: this.$store.state.ajax_nonce,
-              args: {
-                option: temp
-              },
-            },
-          };
-
-      fetchObj = new EpsilonFetchTranslator( data );
-
-      fetch( ajaxurl, fetchObj ).then( function( res ) {
-        return res.json();
-      } ).then( function( json ) {
-        if ( json.status && 'ok' === json.message ) {
-          self.demos = false;
-        }
-      } );
-    },
-  },
-  /**
-   * Created hook
-   */
-  created: function(): void {
-    this.$root.$on( 'change-tab', this.changeTab );
-    this.$root.$on( 'epsilon-demo-imported', this.setImportedFlag );
-  },
-  beforeMount: function(): void {
-
-  },
 } );
 Vue.component( 'dashboard-tabs-content', dashboardTabsContent );

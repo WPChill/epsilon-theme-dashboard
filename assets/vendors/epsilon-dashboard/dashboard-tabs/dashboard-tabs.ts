@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { dashboardTabsNav } from './tabs-nav/tabs-nav';
 import { dashboardTabsContent } from './tabs-content/tabs-content';
 
-declare let EpsilonDashboard: any, wp: any;
+declare let wp: any;
 
 /**
  * Tabs component
@@ -22,15 +22,6 @@ export const dashboardTabs: any = Vue.extend( {
     'dashboard-tabs-content': dashboardTabsContent,
   },
   /**
-   * Data method
-   * @returns {{}}
-   */
-  data: function() {
-    return {
-      currentTab: this.$store.state.tabs[ 0 ].id,
-    };
-  },
-  /**
    * Component template
    */
   template: `
@@ -40,20 +31,5 @@ export const dashboardTabs: any = Vue.extend( {
         <dashboard-tabs-content></dashboard-tabs-content>
     </div>
   `,
-  methods: {
-    /**
-     * Change the active tab
-     * @param {string} id
-     */
-    changeTab: function( id: string ) {
-      this.currentTab = id;
-    },
-  },
-  /**
-   * Created hook
-   */
-  created: function(): void {
-    this.$root.$on( 'change-tab', this.changeTab );
-  }
 } );
 Vue.component( 'dashboard-tabs', dashboardTabs );

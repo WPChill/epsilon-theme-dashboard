@@ -76,7 +76,7 @@ class Epsilon_Dashboard_Helper {
 		if ( ! empty( $args['theme_mod'] ) ) {
 			return array(
 				'status' => true,
-				'value'  => get_theme_mod( $args['option'], false )
+				'value'  => get_theme_mod( $args['theme_mod'], false )
 			);
 		}
 

@@ -3,7 +3,7 @@ import Vue from 'vue';
 
 import { dashboardTabs } from '../dashboard-tabs/dashboard-tabs';
 
-declare let EpsilonDashboard: any, wp: any;
+declare let wp: any;
 /**
  *
  * @type {ExtendedVue<VueConstructor, any, any, any, Record<never, any>>}

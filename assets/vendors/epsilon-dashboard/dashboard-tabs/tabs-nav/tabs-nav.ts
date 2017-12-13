@@ -18,9 +18,17 @@ export const dashboardTabsNav: any = Vue.extend( {
    */
   data: function() {
     return {
-      currentTab: this.$store.state.tabs[ 0 ].id,
       tabs: this.$store.state.tabs,
     };
+  },
+  computed: {
+    /**
+     * Computed properties
+     * @returns {any}
+     */
+    activeTab: function() {
+      return this.$store.getters.getActiveTab;
+    },
   },
   /**
    * Component template
@@ -28,7 +36,7 @@ export const dashboardTabsNav: any = Vue.extend( {
   template: `
     <nav>
         <template v-for="(tab, index) in tabs">
-            <a :href="'#' + tab.id" :class="{ active: tab.id === currentTab }" @click="changeTab($event, tab.id)">{{ tab.title }}</a>
+            <a :href="'#' + tab.id" :class="{ active: index === activeTab }" @click="changeTab($event, index)">{{ tab.title }}</a>
         </template>
     </nav>
   `,
@@ -39,26 +47,12 @@ export const dashboardTabsNav: any = Vue.extend( {
     /**
      * Send event to component
      * @param {Event} event
-     * @param {string} id
+     * @param {string} index
      */
-    changeTab: function( event: Event, id: string ): void {
+    changeTab: function( event: Event, index: number ): void {
       event.preventDefault();
-      this.currentTab = id;
-      this.$root.$emit( 'change-tab', id );
+      this.$store.commit( 'changeTab', index );
     },
-    /**
-     * When coming from external event, change "active" state
-     * @param {string} id
-     */
-    changeTabFromEvent: function( id: string ) {
-      this.currentTab = id;
-    }
   },
-  /**
-   * Created hook
-   */
-  created: function(): void {
-    this.$root.$on( 'change-tab', this.changeTabFromEvent );
-  }
 } );
 Vue.component( 'dashboard-tabs-nav', dashboardTabsNav );

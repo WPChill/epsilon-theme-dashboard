@@ -2,7 +2,7 @@ import './recommended-actions.scss';
 import Vue from 'vue';
 import { EpsilonFetchTranslator } from '../../epsilon-fetch-translator';
 
-declare let EpsilonDashboard: any, wp: any, ajaxurl: string, jQuery: any;
+declare let wp: any, ajaxurl: string, jQuery: any;
 
 /**
  * Recommended actions
@@ -19,9 +19,16 @@ export const dashboardRecommendedActions: any = Vue.extend( {
    */
   data: function() {
     return {
-      EpsilonDashboard: EpsilonDashboard,
-      actions: [],
+      translations: {
+        noActionsLeft: this.$store.state.translations.noActionsLeft,
+      },
     };
+  },
+
+  computed: {
+    actions: function() {
+      return this.$store.getters.getActions;
+    }
   },
   /**
    * Recommended action template
@@ -29,7 +36,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
   template: `
     <div class="epsilon-dashboard-recommended-actions">
       <template v-if="actions.length == 0">
-        {{ EpsilonDashboard.translations.noActionsLeft }}
+        {{ translations.noActionsLeft }}
       </template>
       <transition-group tag="ul" class="epsilon-dashboard-recommended-actions--list" name="list-complete" mode="in-out">
         <li v-for="(action, index) in actions" class="epsilon-dashboard-recommended-actions--action list-complete-item" v-if="action.visible" :key="action.id">
@@ -65,7 +72,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
      * @param {number} index
      */
     removeAction: function( index: number ) {
-      this.actions.splice( index, 1 );
+      this.$store.commit( 'removeAction', index );
     },
     /**
      * Handle plugin installation/activation
@@ -75,10 +82,10 @@ export const dashboardRecommendedActions: any = Vue.extend( {
       let fetchObj: EpsilonFetchTranslator,
           data = {
             action: 'epsilon_dashboard_ajax_callback',
-            nonce: EpsilonDashboard.ajax_nonce,
+            nonce: this.$store.state.ajax_nonce,
             args: {
               action: [ 'Epsilon_Dashboard_Helper', 'create_plugin_activation_link' ],
-              nonce: EpsilonDashboard.ajax_nonce,
+              nonce: this.$store.state.ajax_nonce,
               args: { slug: this.actions[ actionIndex ].plugin_slug },
             },
           };
@@ -126,7 +133,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
         dataType: 'html',
         url: response.activateUrl,
         success: function( response: any ) {
-          self.actions[ index ].state = 'complete';
+          self.$store.state.actions[ index ].state = 'complete';
           setTimeout( function() {
             self.removeAction( index );
           }, 500 );
@@ -144,10 +151,10 @@ export const dashboardRecommendedActions: any = Vue.extend( {
           fetchObj: EpsilonFetchTranslator,
           data = {
             action: 'epsilon_dashboard_ajax_callback',
-            nonce: EpsilonDashboard.ajax_nonce,
+            nonce: this.$store.state.ajax_nonce,
             args: {
               action: currentAction.handler,
-              nonce: EpsilonDashboard.ajax_nonce,
+              nonce: this.$store.state.ajax_nonce,
               args: [],
             },
           };
@@ -158,7 +165,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
         return res.json();
       } ).then( function( json ) {
         if ( json.status && 'ok' === json.message ) {
-          self.actions[ index ].state = 'complete';
+          self.$store.state.actions[ index ].state = 'complete';
           setTimeout( function() {
             self.removeAction( index );
           }, 500 );
@@ -176,10 +183,10 @@ export const dashboardRecommendedActions: any = Vue.extend( {
           fetchObj: EpsilonFetchTranslator,
           data = {
             action: 'epsilon_dashboard_ajax_callback',
-            nonce: EpsilonDashboard.ajax_nonce,
+            nonce: this.$store.state.ajax_nonce,
             args: {
               action: [ 'Epsilon_Dashboard_Helper', 'set_options' ],
-              nonce: EpsilonDashboard.ajax_nonce,
+              nonce: this.$store.state.ajax_nonce,
               args: currentAction.handler,
             },
           };
@@ -190,7 +197,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
         return res.json();
       } ).then( function( json ) {
         if ( json.status && 'ok' === json.message ) {
-          self.actions[ index ].state = 'complete';
+          self.$store.state.actions[ index ].state = 'complete';
           setTimeout( function() {
             self.removeAction( index );
           }, 500 );
@@ -210,13 +217,13 @@ export const dashboardRecommendedActions: any = Vue.extend( {
           fetchObj: EpsilonFetchTranslator,
           data = {
             action: 'epsilon_dashboard_ajax_callback',
-            nonce: EpsilonDashboard.ajax_nonce,
+            nonce: this.$store.state.ajax_nonce,
             args: {
               action: [ 'Epsilon_Dashboard_Helper', 'set_visibility_option' ],
-              nonce: EpsilonDashboard.ajax_nonce,
+              nonce: this.$store.state.ajax_nonce,
               args: {
                 option: '_actions_left',
-                theme: EpsilonDashboard.theme,
+                theme: this.$store.state.theme,
                 actions: {},
               },
             },
@@ -230,7 +237,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
         return res.json();
       } ).then( function( json ) {
         if ( json.status ) {
-          self.actions[ index ].state = 'complete';
+          self.$store.state.actions[ index ].state = 'complete';
           setTimeout( function() {
             self.removeAction( index );
           }, 500 );
@@ -239,19 +246,18 @@ export const dashboardRecommendedActions: any = Vue.extend( {
     },
     /**
      * Checks which of the options are "visibile"
-     * @param {string} id
      */
-    checkOptionVisibility: function( id: string ) {
+    checkOptionVisibility: function() {
       const self = this;
       let fetchObj: EpsilonFetchTranslator,
           data = {
             action: 'epsilon_dashboard_ajax_callback',
-            nonce: EpsilonDashboard.ajax_nonce,
+            nonce: this.$store.state.ajax_nonce,
             args: {
               action: [ 'Epsilon_Dashboard_Helper', 'get_visibility_options' ],
-              nonce: EpsilonDashboard.ajax_nonce,
+              nonce: this.$store.state.ajax_nonce,
               args: {
-                theme: EpsilonDashboard.theme,
+                theme: this.$store.state.theme,
                 option: '_actions_left',
               },
             },
@@ -264,7 +270,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
       } ).then( function( json ) {
         if ( json.status ) {
           for ( let key in json.option ) {
-            self.actions.map( function( element: any, index: number ) {
+            self.$store.state.actions.map( function( element: any, index: number ) {
               if ( element.id === key ) {
                 self.removeAction( index );
               }
@@ -290,7 +296,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
           this.handleAjax( index, i );
           break;
         case 'change-page':
-          this.$root.$emit( 'change-tab', currentAction.handler );
+          this.$store.commit( 'changeTab', 2 );
           this.actions[ index ].state = false;
           break;
         case 'handle-plugin':
@@ -310,12 +316,12 @@ export const dashboardRecommendedActions: any = Vue.extend( {
    */
   beforeMount: function() {
     const self = this;
-    EpsilonDashboard.actions.map( function( element: any ) {
+    this.actions.map( function( element: any, index: number ) {
       element.visible = true;
-      element.actions.push( { label: EpsilonDashboard.translations.skipAction, type: 'skip-action', handler: null } );
+      element.actions.push( { label: self.$store.state.translations.skipAction, type: 'skip-action', handler: null } );
 
-      if ( ! element.check ) {
-        self.actions.push( element );
+      if ( element.check ) {
+        self.$store.commit( 'removeAction', index );
       }
     } );
 

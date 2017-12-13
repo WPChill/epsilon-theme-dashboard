@@ -28,16 +28,14 @@ export const dashboardDemos: any = Vue.extend( {
         waitImport: this.$store.state.translations.waitImport,
         selectImport: this.$store.state.translations.selectImport,
         pluginsFinished: this.$store.state.translations.pluginsFinished,
+        installing: this.$store.state.translations.installing,
+        activating: this.$store.state.translations.activating,
         import: this.$store.state.translations.import,
         cancel: this.$store.state.translations.cancel,
         select: this.$store.state.translations.select,
         waiting: this.$store.state.translations.waiting,
         completePlugin: this.$store.state.translations.completePlugin,
       },
-      /**
-       * Imported flag,
-       */
-      imported: false,
       /**
        * Demo flags
        */
@@ -58,6 +56,11 @@ export const dashboardDemos: any = Vue.extend( {
       pluginAction: [],
     };
   },
+  computed: {
+    importedDemo: function() {
+      return this.$store.getters.getImportStatus;
+    }
+  },
   methods: {
     /**
      * Import the selected demo
@@ -67,7 +70,7 @@ export const dashboardDemos: any = Vue.extend( {
       const self = this;
       let time: number = 0,
           i: number = 0;
-      if ( this.imported ) {
+      if ( this.importedDemo ) {
         return;
       }
 
@@ -91,8 +94,7 @@ export const dashboardDemos: any = Vue.extend( {
           self.runAjaxInLoop( id, key );
 
           if ( i === self.availableDemos[ id ].content.length && null === self.installerQueue ) {
-            self.imported = true;
-            self.$root.$emit( 'epsilon-demo-imported', true );
+            self.$store.commit( 'setImportedFlag', true );
           }
         }, time );
       }
@@ -179,8 +181,7 @@ export const dashboardDemos: any = Vue.extend( {
         clearInterval( self.installerQueue );
         self.installerQueue = null;
         self.pluginsFinished = true;
-        self.imported = true;
-        self.$root.$emit( 'epsilon-demo-imported', true );
+        self.$store.commit( 'setImportedFlag', true );
         return;
       }
 
@@ -274,10 +275,10 @@ export const dashboardDemos: any = Vue.extend( {
         dataType: 'html',
         url: response.activateUrl,
         beforeSend: function() {
-          self.pluginAction[ demoIndex ][ response.slug ] = this.$store.state.translations.activating;
+          self.pluginAction[ demoIndex ][ response.slug ] = self.translations.activating;
         },
         success: function( res: any ) {
-          self.pluginAction[ demoIndex ][ response.slug ] = this.$store.state.translations.completePlugin;
+          self.pluginAction[ demoIndex ][ response.slug ] = self.translations.completePlugin;
           self.pluginsInstalled.push( response.slug );
           self.pluginsInstalling = false;
         }
@@ -370,7 +371,7 @@ export const dashboardDemos: any = Vue.extend( {
               action: [ 'Epsilon_Dashboard_Helper', 'get_options' ],
               nonce: this.$store.state.ajax_nonce,
               args: {
-                option: this.$store.state.theme[ 'theme-slug' ] + '_content_imported',
+                theme_mod: this.$store.state.theme[ 'theme-slug' ] + '_content_imported',
               },
             },
           };
@@ -380,9 +381,7 @@ export const dashboardDemos: any = Vue.extend( {
         return res.json();
       } ).then( function( json ) {
         if ( json.status && '1' === json.value ) {
-          self.imported = true;
-
-          self.$root.$emit( 'epsilon-demo-imported', true );
+          self.$store.commit( 'setImportedFlag', false );
         }
       } );
 
@@ -396,7 +395,7 @@ export const dashboardDemos: any = Vue.extend( {
       <div class="col epsilon-demo-box demo-complete-item" v-for="(demo, index) in availableDemos" :key="demo.id" v-if="null === currentDemo || index === currentDemo">
         <img :src="demo.thumb" />
         <template v-if="index == currentDemo">
-            <template v-if="imported">
+            <template v-if="importedDemo">
                 <p>{{ translations.contentImported }}</p>
             </template>
             <template v-else>
@@ -439,7 +438,7 @@ export const dashboardDemos: any = Vue.extend( {
         </template>
         <span class="epsilon-demo-title">{{ demo.label }}</span>
         <template v-if="index == currentDemo">
-            <button class="button button-primary" @click="importDemo(index)" :disabled="imported">{{ translations.import }}</button>
+            <button class="button button-primary" @click="importDemo(index)" :disabled="importedDemo">{{ translations.import }}</button>
             <button class="button button-link" @click="selectDemo(index)">{{ translations.cancel }}</button>
         </template>
         <template v-else>
@@ -453,7 +452,7 @@ export const dashboardDemos: any = Vue.extend( {
    */
   beforeMount: function() {
     const self = this;
-    let temp: any, t1: any, t2: any;
+    let temp: any, t1: any;
 
     this.checkAlreadyInstalled();
 
