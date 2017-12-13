@@ -2,7 +2,7 @@ import './demos.scss';
 import Vue from 'vue';
 import { EpsilonFetchTranslator } from '../../epsilon-fetch-translator';
 
-declare let EpsilonDashboard: any, wp: any, ajaxurl: string, jQuery: any;
+declare let wp: any, ajaxurl: string, jQuery: any;
 
 /**
  * Multiple demo functionality
@@ -23,7 +23,17 @@ export const dashboardDemos: any = Vue.extend( {
    */
   data: function() {
     return {
-      EpsilonDashboard: EpsilonDashboard,
+      translations: {
+        contentImported: this.$store.state.translations.contentImported,
+        waitImport: this.$store.state.translations.waitImport,
+        selectImport: this.$store.state.translations.selectImport,
+        pluginsFinished: this.$store.state.translations.pluginsFinished,
+        import: this.$store.state.translations.import,
+        cancel: this.$store.state.translations.cancel,
+        select: this.$store.state.translations.select,
+        waiting: this.$store.state.translations.waiting,
+        completePlugin: this.$store.state.translations.completePlugin,
+      },
       /**
        * Imported flag,
        */
@@ -82,6 +92,7 @@ export const dashboardDemos: any = Vue.extend( {
 
           if ( i === self.availableDemos[ id ].content.length && null === self.installerQueue ) {
             self.imported = true;
+            self.$root.$emit( 'epsilon-demo-imported', true );
           }
         }, time );
       }
@@ -105,10 +116,10 @@ export const dashboardDemos: any = Vue.extend( {
       temp[ contentId ] = self.demoImporter[ demoIndex ][ contentId ];
       data = {
         action: 'epsilon_dashboard_ajax_callback',
-        nonce: EpsilonDashboard.ajax_nonce,
+        nonce: this.$store.state.ajax_nonce,
         args: {
           action: [ 'Epsilon_Import_Data', 'import_selective_data' ],
-          nonce: EpsilonDashboard.ajax_nonce,
+          nonce: this.$store.state.ajax_nonce,
           args: {
             id: this.availableDemos[ demoIndex ].id,
             content: temp,
@@ -169,6 +180,7 @@ export const dashboardDemos: any = Vue.extend( {
         self.installerQueue = null;
         self.pluginsFinished = true;
         self.imported = true;
+        self.$root.$emit( 'epsilon-demo-imported', true );
         return;
       }
 
@@ -216,10 +228,10 @@ export const dashboardDemos: any = Vue.extend( {
 
       data = {
         action: 'epsilon_dashboard_ajax_callback',
-        nonce: EpsilonDashboard.ajax_nonce,
+        nonce: this.$store.state.ajax_nonce,
         args: {
           action: [ 'Epsilon_Dashboard_Helper', 'create_plugin_activation_link' ],
-          nonce: EpsilonDashboard.ajax_nonce,
+          nonce: this.$store.state.ajax_nonce,
           args: { slug: slug },
         },
       };
@@ -242,7 +254,7 @@ export const dashboardDemos: any = Vue.extend( {
      * @private
      */
     _installPlugin: function( slug: string, demoIndex: number ) {
-      this.pluginAction[ demoIndex ][ slug ] = EpsilonDashboard.translations.installing;
+      this.pluginAction[ demoIndex ][ slug ] = this.$store.state.translations.installing;
       wp.updates.installPlugin( {
         slug: slug,
       } );
@@ -262,10 +274,10 @@ export const dashboardDemos: any = Vue.extend( {
         dataType: 'html',
         url: response.activateUrl,
         beforeSend: function() {
-          self.pluginAction[ demoIndex ][ response.slug ] = EpsilonDashboard.translations.activating;
+          self.pluginAction[ demoIndex ][ response.slug ] = this.$store.state.translations.activating;
         },
         success: function( res: any ) {
-          self.pluginAction[ demoIndex ][ response.slug ] = EpsilonDashboard.translations.completePlugin;
+          self.pluginAction[ demoIndex ][ response.slug ] = this.$store.state.translations.completePlugin;
           self.pluginsInstalled.push( response.slug );
           self.pluginsInstalling = false;
         }
@@ -344,6 +356,36 @@ export const dashboardDemos: any = Vue.extend( {
       this[ id ] = this[ id ].filter( function( item: any, pos: any, ary: any ) {
         return ! pos || item != ary[ pos - 1 ];
       } );
+    },
+    /**
+     * Checks if the demo is installed
+     */
+    checkAlreadyInstalled: function() {
+      const self = this;
+      let fetchObj: EpsilonFetchTranslator,
+          data = {
+            action: 'epsilon_dashboard_ajax_callback',
+            nonce: this.$store.state.ajax_nonce,
+            args: {
+              action: [ 'Epsilon_Dashboard_Helper', 'get_options' ],
+              nonce: this.$store.state.ajax_nonce,
+              args: {
+                option: this.$store.state.theme[ 'theme-slug' ] + '_content_imported',
+              },
+            },
+          };
+
+      fetchObj = new EpsilonFetchTranslator( data );
+      fetch( ajaxurl, fetchObj ).then( function( res ) {
+        return res.json();
+      } ).then( function( json ) {
+        if ( json.status && '1' === json.value ) {
+          self.imported = true;
+
+          self.$root.$emit( 'epsilon-demo-imported', true );
+        }
+      } );
+
     }
   },
   /**
@@ -355,11 +397,11 @@ export const dashboardDemos: any = Vue.extend( {
         <img :src="demo.thumb" />
         <template v-if="index == currentDemo">
             <template v-if="imported">
-                <p>{{ EpsilonDashboard.translations.contentImported }}</p>
+                <p>{{ translations.contentImported }}</p>
             </template>
             <template v-else>
-              <p v-if="importing">{{ EpsilonDashboard.translations.waitImport }}</p>
-              <p v-else>{{ EpsilonDashboard.translations.selectImport }}</p>
+              <p v-if="importing">{{ translations.waitImport }}</p>
+              <p v-else>{{ translations.selectImport }}</p>
             </template>
             
             <ul class="epsilon-demo-box--advanced-list" v-if="index == currentDemo">
@@ -372,7 +414,7 @@ export const dashboardDemos: any = Vue.extend( {
                       </span>
                   </template>
                   <template v-else-if="pluginsFinished">
-                    <span class="dashicons dashicons-yes"></span> {{ EpsilonDashboard.translations.pluginsFinished }}
+                    <span class="dashicons dashicons-yes"></span> {{ translations.pluginsFinished }}
                   </template>
                   <template v-else>
                     <epsilon-toggle :parent-index="index" :comp-label="content.label" :comp-id="content.id"></epsilon-toggle>
@@ -397,11 +439,11 @@ export const dashboardDemos: any = Vue.extend( {
         </template>
         <span class="epsilon-demo-title">{{ demo.label }}</span>
         <template v-if="index == currentDemo">
-            <button class="button button-primary" @click="importDemo(index)" :disabled="imported">{{ EpsilonDashboard.translations.import }}</button>
-            <button class="button button-link" @click="selectDemo(index)">{{ EpsilonDashboard.translations.cancel }}</button>
+            <button class="button button-primary" @click="importDemo(index)" :disabled="imported">{{ translations.import }}</button>
+            <button class="button button-link" @click="selectDemo(index)">{{ translations.cancel }}</button>
         </template>
         <template v-else>
-            <button class="button button-primary" @click="selectDemo(index)">{{ EpsilonDashboard.translations.select }}</button>
+            <button class="button button-primary" @click="selectDemo(index)">{{ translations.select }}</button>
         </template>
       </div>
     </transition-group>
@@ -413,13 +455,15 @@ export const dashboardDemos: any = Vue.extend( {
     const self = this;
     let temp: any, t1: any, t2: any;
 
+    this.checkAlreadyInstalled();
+
     let fetchObj: EpsilonFetchTranslator,
         data = {
           action: 'epsilon_dashboard_ajax_callback',
-          nonce: EpsilonDashboard.ajax_nonce,
+          nonce: this.$store.state.ajax_nonce,
           args: {
             action: [ 'Epsilon_Dashboard_Helper', 'get_demos' ],
-            nonce: EpsilonDashboard.ajax_nonce,
+            nonce: this.$store.state.ajax_nonce,
             args: {
               path: this.path
             },
@@ -445,11 +489,11 @@ export const dashboardDemos: any = Vue.extend( {
             if ( 'plugins' === json.demos[ key ].content[ i ].id ) {
               t1 = {};
               for ( let j = 0; j < json.demos[ key ].content[ i ].additional.length; j ++ ) {
-                t1[ json.demos[ key ].content[ i ].additional[ j ].slug ] = EpsilonDashboard.translations.waiting;
+                t1[ json.demos[ key ].content[ i ].additional[ j ].slug ] = self.translations.waiting;
 
                 if ( json.demos[ key ].content[ i ].additional[ j ].active ) {
                   self.pluginsInstalled.push( json.demos[ key ].content[ i ].additional[ j ].slug );
-                  t1[ json.demos[ key ].content[ i ].additional[ j ].slug ] = EpsilonDashboard.translations.completePlugin;
+                  t1[ json.demos[ key ].content[ i ].additional[ j ].slug ] = self.translations.completePlugin;
                 }
               }
               self.pluginAction.push( t1 );

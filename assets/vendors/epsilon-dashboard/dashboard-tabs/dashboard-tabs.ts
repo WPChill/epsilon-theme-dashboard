@@ -27,8 +27,7 @@ export const dashboardTabs: any = Vue.extend( {
    */
   data: function() {
     return {
-      EpsilonDashboard: EpsilonDashboard,
-      currentTab: EpsilonDashboard.tabs[ 0 ].id,
+      currentTab: this.$store.state.tabs[ 0 ].id,
     };
   },
   /**
@@ -42,9 +41,13 @@ export const dashboardTabs: any = Vue.extend( {
     </div>
   `,
   methods: {
+    /**
+     * Change the active tab
+     * @param {string} id
+     */
     changeTab: function( id: string ) {
       this.currentTab = id;
-    }
+    },
   },
   /**
    * Created hook

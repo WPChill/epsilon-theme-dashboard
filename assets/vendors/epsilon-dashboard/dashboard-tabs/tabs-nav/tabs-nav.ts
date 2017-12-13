@@ -1,7 +1,7 @@
 import './tabs-nav.scss';
 import Vue from 'vue';
 
-declare let EpsilonDashboard: any, wp: any;
+declare let wp: any;
 
 /**
  * Tabs component
@@ -18,8 +18,8 @@ export const dashboardTabsNav: any = Vue.extend( {
    */
   data: function() {
     return {
-      EpsilonDashboard: EpsilonDashboard,
-      currentTab: EpsilonDashboard.tabs[ 0 ].id,
+      currentTab: this.$store.state.tabs[ 0 ].id,
+      tabs: this.$store.state.tabs,
     };
   },
   /**
@@ -27,7 +27,7 @@ export const dashboardTabsNav: any = Vue.extend( {
    */
   template: `
     <nav>
-        <template v-for="(tab, index) in EpsilonDashboard.tabs">
+        <template v-for="(tab, index) in tabs">
             <a :href="'#' + tab.id" :class="{ active: tab.id === currentTab }" @click="changeTab($event, tab.id)">{{ tab.title }}</a>
         </template>
     </nav>

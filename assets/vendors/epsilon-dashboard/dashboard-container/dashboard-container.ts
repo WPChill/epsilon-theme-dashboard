@@ -20,12 +20,22 @@ export const dashboardContainer: any = Vue.extend( {
     'dashboard-tabs': dashboardTabs
   },
   /**
-   * Data model
-   * @returns {{EpsilonDashboard: any}}
+   * Data methods
    */
   data: function() {
     return {
-      EpsilonDashboard: EpsilonDashboard,
+      /**
+       * Get header from store
+       */
+      header: this.$store.state.header,
+      /**
+       * Get intro from store
+       */
+      intro: this.$store.state.intro,
+      /**
+       * Get logo from store
+       */
+      logo: this.$store.state.logo,
     };
   },
   /**
@@ -33,10 +43,10 @@ export const dashboardContainer: any = Vue.extend( {
    */
   template: `
     <div class="epsilon-dashboard-container">
-        <h1> {{ EpsilonDashboard.header }} </h1>
+        <h1> {{ header }} </h1>
         <div class="epsilon-dashboard-container--intro">
-            <p>{{ EpsilonDashboard.intro }}</p>
-            <img :src="EpsilonDashboard.logo" />
+            <p>{{ intro }}</p>
+            <img :src="logo" />
         </div>
         
         <dashboard-tabs></dashboard-tabs>

@@ -32,6 +32,7 @@
     "css-loader": "^0.28.7",
     "style-loader": "^0.19.0",
     "vue": "https://github.com/DanielRosenwasser/vue#540a38fb21adb7a7bc394c65e23e6cffb36cd867",
-    "vue-router": "https://github.com/DanielRosenwasser/vue-router#01b8593cf69c2a5077df45e37e2b24d95bf35ce3"
+    "vue-router": "https://github.com/DanielRosenwasser/vue-router#01b8593cf69c2a5077df45e37e2b24d95bf35ce3",
+    "vuex": "^3.0.1"
   }
 }

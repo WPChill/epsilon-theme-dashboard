@@ -59,6 +59,34 @@ class Epsilon_Dashboard_Helper {
 	}
 
 	/**
+	 * Gets the value of an worpdress option
+	 *
+	 * @param array $args
+	 *
+	 * @return array
+	 */
+	public static function get_options( $args = array() ) {
+		if ( ! empty( $args['option'] ) ) {
+			return array(
+				'status' => true,
+				'value'  => get_option( $args['option'], false )
+			);
+		}
+
+		if ( ! empty( $args['theme_mod'] ) ) {
+			return array(
+				'status' => true,
+				'value'  => get_theme_mod( $args['option'], false )
+			);
+		}
+
+		return array(
+			'status' => false,
+			'value'  => null,
+		);
+	}
+
+	/**
 	 * Get visibility options
 	 *
 	 * @param array $args
