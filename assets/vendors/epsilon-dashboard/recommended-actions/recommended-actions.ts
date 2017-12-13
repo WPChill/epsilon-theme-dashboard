@@ -19,6 +19,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
    */
   data: function() {
     return {
+      EpsilonDashboard: EpsilonDashboard,
       actions: [],
     };
   },
@@ -27,9 +28,11 @@ export const dashboardRecommendedActions: any = Vue.extend( {
    */
   template: `
     <div class="epsilon-dashboard-recommended-actions">
+      <template v-if="actions.length == 0">
+        {{ EpsilonDashboard.translations.noActionsLeft }}
+      </template>
       <transition-group tag="ul" class="epsilon-dashboard-recommended-actions--list" name="list-complete" mode="in-out">
-        <li v-for="(action, index) in actions" class="epsilon-dashboard-recommended-actions--action list-complete-item" :key="action.id">
-        
+        <li v-for="(action, index) in actions" class="epsilon-dashboard-recommended-actions--action list-complete-item" v-if="action.visible" :key="action.id">
           <template>
             <span class="state-holder" :class="'state-' + action.state">
                 <transition name="tray" mode="in-out">
@@ -43,8 +46,10 @@ export const dashboardRecommendedActions: any = Vue.extend( {
           <h4>{{ action.title }}</h4>
           <p>{{ action.description }}</p>
           <div class="action-initiators" v-if="action.actions">
-            <template v-for="(init, i) in action.actions">
-                <a class="button button-primary" href="#" @click="initAction($event, index, i)">{{ init.label }}</a>
+            <template>
+              <template v-for="(init, i) in action.actions">
+                  <a class="button button-primary" href="#" @click="initAction($event, index, i)">{{ init.label }}</a>
+              </template>
             </template>
           </div>
         </li>
@@ -193,6 +198,82 @@ export const dashboardRecommendedActions: any = Vue.extend( {
       } );
     },
     /**
+     * Skips a required action
+     *
+     * @param {number} index
+     * @param {number} actionIndex
+     */
+    skipAction( index: number, actionIndex: number ) {
+      const self = this;
+      let currentAction = this.actions[ index ].actions[ actionIndex ],
+          temp: any = {},
+          fetchObj: EpsilonFetchTranslator,
+          data = {
+            action: 'epsilon_dashboard_ajax_callback',
+            nonce: EpsilonDashboard.ajax_nonce,
+            args: {
+              action: [ 'Epsilon_Dashboard_Helper', 'set_visibility_option' ],
+              nonce: EpsilonDashboard.ajax_nonce,
+              args: {
+                option: '_actions_left',
+                theme: EpsilonDashboard.theme,
+                actions: {},
+              },
+            },
+          };
+
+      temp[ this.actions[ index ].id ] = 'false';
+      data.args.args.actions = temp;
+      fetchObj = new EpsilonFetchTranslator( data );
+
+      fetch( ajaxurl, fetchObj ).then( function( res ) {
+        return res.json();
+      } ).then( function( json ) {
+        if ( json.status ) {
+          self.actions[ index ].state = 'complete';
+          setTimeout( function() {
+            self.removeAction( index );
+          }, 500 );
+        }
+      } );
+    },
+    /**
+     * Checks which of the options are "visibile"
+     * @param {string} id
+     */
+    checkOptionVisibility: function( id: string ) {
+      const self = this;
+      let fetchObj: EpsilonFetchTranslator,
+          data = {
+            action: 'epsilon_dashboard_ajax_callback',
+            nonce: EpsilonDashboard.ajax_nonce,
+            args: {
+              action: [ 'Epsilon_Dashboard_Helper', 'get_visibility_options' ],
+              nonce: EpsilonDashboard.ajax_nonce,
+              args: {
+                theme: EpsilonDashboard.theme,
+                option: '_actions_left',
+              },
+            },
+          };
+
+      fetchObj = new EpsilonFetchTranslator( data );
+
+      fetch( ajaxurl, fetchObj ).then( function( res ) {
+        return res.json();
+      } ).then( function( json ) {
+        if ( json.status ) {
+          for ( let key in json.option ) {
+            self.actions.map( function( element: any, index: number ) {
+              if ( element.id === key ) {
+                self.removeAction( index );
+              }
+            } );
+          }
+        }
+      } );
+    },
+    /**
      * Initiate the required action
      *
      * @param {event} event
@@ -215,6 +296,9 @@ export const dashboardRecommendedActions: any = Vue.extend( {
         case 'handle-plugin':
           this.handlePlugin( index, i );
           break;
+        case 'skip-action':
+          this.skipAction( index, i );
+          break;
         default:
           this.handleOption( index, i );
           break;
@@ -227,10 +311,15 @@ export const dashboardRecommendedActions: any = Vue.extend( {
   beforeMount: function() {
     const self = this;
     EpsilonDashboard.actions.map( function( element: any ) {
+      element.visible = true;
+      element.actions.push( { label: EpsilonDashboard.translations.skipAction, type: 'skip-action', handler: null } );
+
       if ( ! element.check ) {
         self.actions.push( element );
       }
     } );
+
+    self.checkOptionVisibility();
   }
 } );
 Vue.component( 'recommended-actions', dashboardRecommendedActions );

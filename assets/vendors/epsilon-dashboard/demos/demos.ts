@@ -23,6 +23,7 @@ export const dashboardDemos: any = Vue.extend( {
    */
   data: function() {
     return {
+      EpsilonDashboard: EpsilonDashboard,
       /**
        * Imported flag,
        */
@@ -79,7 +80,6 @@ export const dashboardDemos: any = Vue.extend( {
 
           self.runAjaxInLoop( id, key );
 
-          console.log( self.installerQueue );
           if ( i === self.availableDemos[ id ].content.length && null === self.installerQueue ) {
             self.imported = true;
           }
@@ -163,6 +163,7 @@ export const dashboardDemos: any = Vue.extend( {
      */
     _handlePlugin( demoIndex: number, contentId: string, element: { label: string, slug: string, installed: boolean, active: boolean } ) {
       const self = this;
+      self.removeDupes( 'pluginsInstalled' );
       if ( self.pluginsInstalled.length >= self.pluginsCount ) {
         clearInterval( self.installerQueue );
         self.installerQueue = null;
@@ -334,6 +335,15 @@ export const dashboardDemos: any = Vue.extend( {
       }
 
       return 'update';
+    },
+    /**
+     * Removes duplicates
+     * @param {string} id
+     */
+    removeDupes: function( id: string ) {
+      this[ id ] = this[ id ].filter( function( item: any, pos: any, ary: any ) {
+        return ! pos || item != ary[ pos - 1 ];
+      } );
     }
   },
   /**
@@ -387,14 +397,14 @@ export const dashboardDemos: any = Vue.extend( {
         </template>
         <span class="epsilon-demo-title">{{ demo.label }}</span>
         <template v-if="index == currentDemo">
-            <button class="button button-primary" @click="importDemo(index)">{{ EpsilonDashboard.translations.import }}</button>
+            <button class="button button-primary" @click="importDemo(index)" :disabled="imported">{{ EpsilonDashboard.translations.import }}</button>
             <button class="button button-link" @click="selectDemo(index)">{{ EpsilonDashboard.translations.cancel }}</button>
         </template>
         <template v-else>
             <button class="button button-primary" @click="selectDemo(index)">{{ EpsilonDashboard.translations.select }}</button>
         </template>
       </div>
-    </div>
+    </transition-group>
   `,
   /**
    * Before mount hook
@@ -446,6 +456,8 @@ export const dashboardDemos: any = Vue.extend( {
             }
           }
         }
+
+        self.removeDupes( 'pluginsInstalled' );
       }
     } );
   },

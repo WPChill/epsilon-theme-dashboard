@@ -16,6 +16,18 @@
       margin-top: 0;
     }
 
+    .epsilon-action-visibility {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      text-decoration: none;
+      &:hover, &:focus {
+        text-decoration: none;
+        outline: none;
+        box-shadow: none;
+      }
+    }
+
     .state-holder {
       position: absolute;
       top: 0;

@@ -59,6 +59,39 @@ class Epsilon_Dashboard_Helper {
 	}
 
 	/**
+	 * Get visibility options
+	 *
+	 * @param array $args
+	 *
+	 * @return array
+	 */
+	public static function get_visibility_options( $args = array() ) {
+		return array(
+			'status' => true,
+			'option' => get_option( $args['theme']['theme-slug'] . $args['option'], array() )
+		);
+	}
+
+	/**
+	 * Set visibility option for a required action
+	 *
+	 * @param array $args
+	 *
+	 * @return string;
+	 */
+	public static function set_visibility_option( $args = array() ) {
+		$option = get_option( $args['theme']['theme-slug'] . $args['option'], array() );
+
+		foreach ( $args['actions'] as $action => $value ) {
+			$args['actions'][ $action ] = filter_var( $value, FILTER_VALIDATE_BOOLEAN );
+		}
+
+		update_option( $args['theme']['theme-slug'] . $args['option'], wp_parse_args( $args['actions'], $option ) );
+
+		return 'ok';
+	}
+
+	/**
 	 * Sets options
 	 *
 	 * @param array $options

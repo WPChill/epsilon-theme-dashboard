@@ -20,6 +20,15 @@ export const dashboardContainer: any = Vue.extend( {
     'dashboard-tabs': dashboardTabs
   },
   /**
+   * Data model
+   * @returns {{EpsilonDashboard: any}}
+   */
+  data: function() {
+    return {
+      EpsilonDashboard: EpsilonDashboard,
+    };
+  },
+  /**
    * Template for the container
    */
   template: `

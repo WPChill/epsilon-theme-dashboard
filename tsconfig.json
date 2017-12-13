@@ -5,7 +5,7 @@
     "strict": true,
     "noImplicitReturns": true,
     "noImplicitThis": false,
-    "module": "commonjs",
+    "module": "es2015",
     "moduleResolution": "node",
     "target": "es5",
     "typeRoots": [

@@ -95,9 +95,22 @@ class Epsilon_Onboarding {
 		/**
 		 * Use the localize script to send data from the backend to our app
 		 */
-		wp_localize_script( 'epsilon-onboarding', 'EpsilonOnboarding', array(
-			'steps' => $this->steps
-		) );
+		wp_localize_script( 'epsilon-onboarding', 'EpsilonOnboarding', $this->epsilon_onboarding_setup() );
+	}
+
+	/**
+	 * Filter the on boarding setup so we can access it in theme
+	 *
+	 * @return mixed
+	 */
+	public function epsilon_onboarding_setup() {
+		return apply_filters(
+			'epsilon-onboarding-setup',
+			array(
+				'ajax_nonce' => wp_create_nonce( 'epsilon_dashboard_nonce' ),
+				'steps'      => $this->steps,
+			)
+		);
 	}
 
 	/**

@@ -169,13 +169,34 @@ class Epsilon_Import_Data {
 
 	/**
 	 * Import all content
+	 *
+	 * @param array $args
+	 *
+	 * @return string
 	 */
-	public static function import_all_content() {
+	public static function import_all_content( $args = array() ) {
+		$content = array(
+			'id'      => 'standard',
+			'content' => array(
+				'menus'    => true,
+				'options'  => true,
+				'widgets'  => true,
+				'content'  => true,
+				'sections' => true,
+			)
+		);
 
+		$status = self::import_selective_data( $content );
+
+		return $status;
 	}
 
 	/**
 	 * Import selective data
+	 *
+	 * @param array $args
+	 *
+	 * @return string
 	 */
 	public static function import_selective_data( $args = array() ) {
 		$instance = self::get_instance();

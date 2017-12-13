@@ -18,6 +18,7 @@ export const dashboardTabsNav: any = Vue.extend( {
    */
   data: function() {
     return {
+      EpsilonDashboard: EpsilonDashboard,
       currentTab: EpsilonDashboard.tabs[ 0 ].id,
     };
   },
