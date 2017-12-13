@@ -319,7 +319,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
     this.actions.map( function( element: any, index: number ) {
       element.visible = true;
       element.actions.push( { label: self.$store.state.translations.skipAction, type: 'skip-action', handler: null } );
-
+      //@todo somehow a completed action is left here
       if ( element.check ) {
         self.$store.commit( 'removeAction', index );
       }
