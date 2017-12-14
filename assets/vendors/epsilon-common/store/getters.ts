@@ -26,5 +26,19 @@ export const getters = {
    */
   getImportStatus: function( state: any ) {
     return state.importedDemo;
-  }
+  },
+  /**
+   * Grab license key
+   * @param state
+   */
+  getLicenseKey: function( state: any ) {
+    return state.edd.license;
+  },
+  /**
+   * Grab license status
+   * @param state
+   */
+  getLicenseStatus: function( state: any ) {
+    return state.edd.status;
+  },
 };

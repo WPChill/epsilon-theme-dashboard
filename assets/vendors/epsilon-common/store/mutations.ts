@@ -32,6 +32,22 @@ export const mutations = {
     state.activeTab = index;
   },
   /**
+   * Update license key
+   * @param state
+   * @param {string} value
+   */
+  updateLicenseKey( state: any, value: string ) {
+    state.edd.license = value;
+  },
+  /**
+   * Update license status
+   * @param state
+   * @param {string} value
+   */
+  updateLicenseStatus( state: any, value: string ) {
+    state.edd.status = value;
+  },
+  /**
    * Sets imported flag
    * @param state
    * @param {boolean} change

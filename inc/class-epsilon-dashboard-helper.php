@@ -40,6 +40,22 @@ class Epsilon_Dashboard_Helper {
 	}
 
 	/**
+	 * Formats the plugins
+	 *
+	 * @param array $args
+	 *
+	 * @return array | string
+	 */
+	public static function format_plugins( $args = array() ) {
+		$instance = Epsilon_Plugin_Helper::get_instance( $args );
+
+		return array(
+			'status'  => true,
+			'plugins' => $instance->handle_plugins(),
+		);
+	}
+
+	/**
 	 * Sets an option in wordpress
 	 *
 	 * @param array $args

@@ -4,11 +4,13 @@ import Vuex from 'vuex';
 
 import './dashboard.scss';
 import { dashboardContainer } from './dashboard-container/dashboard-container';
-import { dashboardRecommendedActions } from './recommended-actions/recommended-actions';
-import { dashboardDemos } from './demos/demos';
-import { epsilonToggle } from '../epsilon-fields/epsilon-toggle/epsilon-toggle';
+import { dashboardPlugins } from '../epsilon-common/plugins/plugins';
+import { dashboardRecommendedActions } from '../epsilon-common/recommended-actions/recommended-actions';
+import { dashboardDemos } from '../epsilon-common/demos/demos';
+import { dashboardRegistration } from '../epsilon-common/registration/registration';
+import { epsilonToggle } from '../epsilon-common/epsilon-fields/epsilon-toggle/epsilon-toggle';
 
-import Store from './store/store';
+import Store from '../epsilon-common/store/store';
 
 const epsilonDashboardVue = new Vue( {
   /**
@@ -26,6 +28,8 @@ const epsilonDashboardVue = new Vue( {
     'dashboard-container': dashboardContainer,
     'recommended-actions': dashboardRecommendedActions,
     'demos': dashboardDemos,
+    'plugins': dashboardPlugins,
+    'registration': dashboardRegistration,
     'epsilon-toggle': epsilonToggle,
   },
   /**
