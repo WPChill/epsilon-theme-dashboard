@@ -188,6 +188,9 @@ class Epsilon_Import_Data {
 
 		$status = self::import_selective_data( $content );
 
+		$theme = wp_get_theme();
+		set_theme_mod( $theme->get( 'TextDomain' ) . '_content_imported', true );
+
 		return $status;
 	}
 

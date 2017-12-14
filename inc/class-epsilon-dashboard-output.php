@@ -119,16 +119,25 @@ class Epsilon_Dashboard_Output {
 	 * @return mixed
 	 */
 	public function epsilon_dashboard_setup() {
+		$theme = array(
+			'logo'   => esc_url( get_template_directory_uri() . '/inc/libraries/epsilon-theme-dashboard/assets/images/macho-themes-logo.png' ),
+			/* Translators: Dashboard Header Title. */
+			'header' => sprintf( esc_html__( 'Welcome to %1$s - v', 'epsilon-framework' ), esc_html( $this->theme['theme-name'] ) ) . esc_html( $this->theme['theme-version'] ),
+			/* Translators: Dashboard Header Intro. */
+			'intro'  => sprintf( esc_html__( '%1$s is now installed and ready to use! Get ready to build something beautiful. We hope you enjoy it! We want to make sure you have the best experience using %1$s and that is why we gathered here all the necessary information for you. We hope you will enjoy using %1$s, as much as we enjoy creating great products.', 'epsilon-framework' ), esc_html( $this->theme['theme-name'] ) ),
+		);
+		$theme = wp_parse_args( $theme, $this->theme );
+
+		$theme = apply_filters(
+			'epsilon-dashboard-company',
+			$theme
+		);
+
 		return apply_filters(
 			'epsilon-dashboard-setup',
 			array(
 				'ajax_nonce'   => wp_create_nonce( 'epsilon_dashboard_nonce' ),
-				'theme'        => $this->theme,
-				'logo'         => esc_url( get_template_directory_uri() . '/inc/libraries/epsilon-theme-dashboard/assets/images/macho-themes-logo.png' ),
-				/* Translators: Dashboard Header Title. */
-				'header'       => sprintf( esc_html__( 'Welcome to %1$s - v', 'epsilon-framework' ), esc_html( $this->theme['theme-name'] ) ) . esc_html( $this->theme['theme-version'] ),
-				/* Translators: Dashboard Header Intro. */
-				'intro'        => sprintf( esc_html__( '%1$s is now installed and ready to use! Get ready to build something beautiful. We hope you enjoy it! We want to make sure you have the best experience using %1$s and that is why we gathered here all the necessary information for you. We hope you will enjoy using %1$s, as much as we enjoy creating great products.', 'epsilon-framework' ), esc_html( $this->theme['theme-name'] ) ),
+				'theme'        => $theme,
 				'translations' => array(
 					'select'          => esc_html__( 'Select', 'epsilon-framework' ),
 					'import'          => esc_html__( 'Import', 'epsilon-framework' ),

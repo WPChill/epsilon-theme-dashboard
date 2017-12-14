@@ -27,15 +27,15 @@ export const dashboardContainer: any = Vue.extend( {
       /**
        * Get header from store
        */
-      header: this.$store.state.header,
+      header: this.$store.state.theme.header,
       /**
        * Get intro from store
        */
-      intro: this.$store.state.intro,
+      intro: this.$store.state.theme.intro,
       /**
        * Get logo from store
        */
-      logo: this.$store.state.logo,
+      logo: this.$store.state.theme.logo,
     };
   },
   /**

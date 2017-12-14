@@ -21,6 +21,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
     return {
       translations: {
         noActionsLeft: this.$store.state.translations.noActionsLeft,
+        skipAction: this.$store.state.translations.skipAction,
       },
     };
   },
@@ -38,7 +39,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
       <template v-if="actions.length == 0">
         {{ translations.noActionsLeft }}
       </template>
-      <transition-group tag="ul" class="epsilon-dashboard-recommended-actions--list" name="list-complete" mode="in-out">
+      <transition-group tag="ul" class="epsilon-dashboard-recommended-actions--list" name="list-complete" mode="in-out" v-if="actions.length">
         <li v-for="(action, index) in actions" class="epsilon-dashboard-recommended-actions--action list-complete-item" v-if="action.visible" :key="action.id">
           <template>
             <span class="state-holder" :class="'state-' + action.state">
@@ -133,7 +134,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
         dataType: 'html',
         url: response.activateUrl,
         success: function( response: any ) {
-          self.$store.state.actions[ index ].state = 'complete';
+          self.actions[ index ].state = 'complete';
           setTimeout( function() {
             self.removeAction( index );
           }, 500 );
@@ -165,7 +166,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
         return res.json();
       } ).then( function( json ) {
         if ( json.status && 'ok' === json.message ) {
-          self.$store.state.actions[ index ].state = 'complete';
+          self.actions[ index ].state = 'complete';
           setTimeout( function() {
             self.removeAction( index );
           }, 500 );
@@ -197,7 +198,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
         return res.json();
       } ).then( function( json ) {
         if ( json.status && 'ok' === json.message ) {
-          self.$store.state.actions[ index ].state = 'complete';
+          self.actions[ index ].state = 'complete';
           setTimeout( function() {
             self.removeAction( index );
           }, 500 );
@@ -237,7 +238,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
         return res.json();
       } ).then( function( json ) {
         if ( json.status ) {
-          self.$store.state.actions[ index ].state = 'complete';
+          self.actions[ index ].state = 'complete';
           setTimeout( function() {
             self.removeAction( index );
           }, 500 );
@@ -270,7 +271,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
       } ).then( function( json ) {
         if ( json.status ) {
           for ( let key in json.option ) {
-            self.$store.state.actions.map( function( element: any, index: number ) {
+            self.actions.map( function( element: any, index: number ) {
               if ( element.id === key ) {
                 self.removeAction( index );
               }
@@ -289,15 +290,19 @@ export const dashboardRecommendedActions: any = Vue.extend( {
     initAction: function( event: Event, index: number, i: number ) {
       event.preventDefault();
       this.actions[ index ].state = 'loading';
-
       let currentAction = this.actions[ index ].actions[ i ];
       switch ( currentAction.type ) {
         case 'ajax':
           this.handleAjax( index, i );
           break;
         case 'change-page':
-          this.$store.commit( 'changeTab', 2 );
-          this.actions[ index ].state = false;
+          const self = this;
+          this.$store.state.tabs.map( function( element: any, i: number ) {
+            if ( element.id === currentAction.handler ) {
+              self.actions[ index ].state = false;
+              self.$store.commit( 'changeTab', i );
+            }
+          } );
           break;
         case 'handle-plugin':
           this.handlePlugin( index, i );
@@ -316,14 +321,19 @@ export const dashboardRecommendedActions: any = Vue.extend( {
    */
   beforeMount: function() {
     const self = this;
+    let arrayToRemove: Array<number> = [];
     this.actions.map( function( element: any, index: number ) {
       element.visible = true;
-      element.actions.push( { label: self.$store.state.translations.skipAction, type: 'skip-action', handler: null } );
-      //@todo somehow a completed action is left here
-      if ( element.check ) {
-        self.$store.commit( 'removeAction', index );
+      element.actions.push( { label: self.translations.skipAction, type: 'skip-action', handler: null } );
+
+      if ( element.check || '1' === element.check ) {
+        arrayToRemove.push( index );
       }
     } );
+
+    for ( let i = 0; i < arrayToRemove.length; i ++ ) {
+      self.removeAction( arrayToRemove[ i ] );
+    }
 
     self.checkOptionVisibility();
   }
