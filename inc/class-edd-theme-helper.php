@@ -82,8 +82,7 @@ class EDD_Theme_Helper {
 		$api_params = array(
 			'edd_action' => 'check_license',
 			'license'    => $license,
-			//@todo hardcoded pro here
-			'item_name'  => rawurlencode( $args['theme']['theme-slug'] . '-pro' ),
+			'item_name'  => rawurlencode( $args['theme']['theme-slug'] ),
 			'url'        => home_url(),
 		);
 
