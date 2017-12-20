@@ -112,6 +112,7 @@ class EDD_Theme_Helper {
 			'licenseStatus' => $license_data->license
 		);
 
+		update_option( $args['theme']['theme-slug'] . '_license_object', array() );
 		update_option( $args['theme']['theme-slug'] . '_license_object', $arr );
 
 		$arr['status'] = true;
@@ -131,15 +132,15 @@ class EDD_Theme_Helper {
 	}
 
 	/**
-	 * Activates license
-	 *
 	 * @param array $args
+	 *
+	 * @return array
 	 */
 	public static function activate_license( $args = array() ) {
 		$expires    = false;
 		$message    = '';
 		$renew_link = '';
-
+		$strings    = self::get_strings();
 		$api_params = array(
 			'edd_action' => 'activate_license',
 			'license'    => $args['license'],
@@ -162,6 +163,7 @@ class EDD_Theme_Helper {
 				'licenseStatus' => $license_data->license
 			);
 
+			update_option( $args['theme']['theme-slug'] . '_license_object', array() );
 			update_option( $args['theme']['theme-slug'] . '_license_object', $arr );
 
 			return $arr;
@@ -181,7 +183,7 @@ class EDD_Theme_Helper {
 		$expires    = false;
 		$message    = '';
 		$renew_link = '';
-
+		$strings    = self::get_strings();
 		$api_params = array(
 			'edd_action' => 'deactivate_license',
 			'license'    => $args['license'],
@@ -203,6 +205,7 @@ class EDD_Theme_Helper {
 				'licenseStatus' => 'inactive'
 			);
 
+			update_option( $args['theme']['theme-slug'] . '_license_object', array() );
 			update_option( $args['theme']['theme-slug'] . '_license_object', $arr );
 
 			return $arr;

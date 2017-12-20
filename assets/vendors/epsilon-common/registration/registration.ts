@@ -57,45 +57,6 @@ export const dashboardRegistration: any = Vue.extend( {
    */
   methods: {
     /**
-     * Returns a translation string
-     */
-    getActionLabel: function() {
-      let string = '';
-
-      switch ( this.licenseStatus ) {
-        case 'invalid':
-        case 'inactive':
-        case 'activate':
-        case 'check':
-          string = this.translations.checkLicense;
-          break;
-        case 'valid':
-          string = this.translations.activateLicense;
-          break;
-        default:
-          string = this.translations.saveLicense;
-          break;
-      }
-
-      return string;
-    },
-    /**
-     * Handles license
-     */
-    handleLicense: function() {
-      switch ( this.licenseStatus ) {
-        case 'check':
-          this.checkLicense();
-          break;
-        case 'inactive':
-          this.activateLicense();
-          break;
-        default:
-          this.saveLicense();
-          break;
-      }
-    },
-    /**
      * License deactivator
      */
     deactivateLicense: function() {
@@ -236,17 +197,15 @@ export const dashboardRegistration: any = Vue.extend( {
         <p v-if="licenseExpiry">{{ translations.expires }} {{ licenseExpiry }}</p>
       </div>
     </div>
-    <button class="button" :disabled="processing" @click="handleLicense()"> {{ getActionLabel() }} </button>
-    <button v-if="licenseStatus === 'valid'" class="button" @click="deactivateLicense()"> {{ translations.deactivateLicense }} </button>
+    <button class="button" :disabled="processing" @click="checkLicense()"> {{ translations.checkLicense }} </button>
+    <template v-if="licenseStatus === 'valid'">
+        <button v-if="licenseStatus === 'valid'" class="button" @click="deactivateLicense()"> {{ translations.deactivateLicense }} </button>
+    </template>
+    <template v-else-if="licenseStatus">
+        <button v-if="licenseStatus" class="button" :disabled="processing" @click="activateLicense()"> {{ translations.activateLicense }} </button>
+    </template>
   </div>
   `,
-  /**
-   * Before mount lifecycle
-   * check database for license key
-   */
-  beforeMount: function() {
-
-  },
 } );
 
 Vue.component( 'registration', dashboardRegistration );

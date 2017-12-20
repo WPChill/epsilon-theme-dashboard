@@ -75,6 +75,16 @@ export const dashboardTabsContent: any = Vue.extend( {
             <template v-else-if="tab.type === 'registration'">
                 <registration></registration>
             </template>
+            
+            <template v-else-if="tab.type === 'option-page'">
+                <h3>{{ tab.content.title }}</h3>
+                <p v-for="paragraph in tab.content.paragraphs" v-html="paragraph"></p>
+                <option-page :fields="tab.fields"></option-page>
+            </template>
+            
+            <template v-else-if="tab.type === 'comparison-table'">
+                <comparison-tables :features="tab.features"></comparison-tables>
+            </template>
           </div>
         </template>
       </div>

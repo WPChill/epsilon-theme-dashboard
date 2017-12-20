@@ -10,7 +10,7 @@ export const getters = {
    * @returns {(() => any) | (() => (state: any) => any)}
    */
   getActiveTab: function( state: any ) {
-    return state.activeTab;
+    return parseInt( state.activeTab, 10 );
   },
   /**
    * Get current actions
@@ -41,4 +41,11 @@ export const getters = {
   getLicenseStatus: function( state: any ) {
     return state.edd.status;
   },
+  /**
+   * Gets the field value based on a "relation"
+   * @param state
+   */
+  getFieldRelation: ( state: any ) => ( id: string ) => {
+    return state.privacy[ id ];
+  }
 };

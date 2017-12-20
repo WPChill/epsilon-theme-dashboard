@@ -11,7 +11,7 @@ export const dashboardPlugins: any = Vue.extend( {
   name: 'plugins',
   /**
    * Plugins model
-   * @returns {{plugins: any[]}}
+   * @returns {{ plugins: any[] }}
    */
   data: function() {
     return {
@@ -30,8 +30,8 @@ export const dashboardPlugins: any = Vue.extend( {
    * Template part
    */
   template: `
-  <div class="row">
-    <div class="col epsilon-plugin-box" v-for="(plugin, index) in plugins">
+    <transition-group tag="div" name="demo-complete" class="row">
+      <div class="col epsilon-plugin-box demo-complete-item" v-for="(plugin, index) in plugins" :key="index">
         <span v-if="plugin.recommended" class="epsilon-plugin-box--recommended">{{ translations.recommended }}</span>
         <img :src="plugin.icon" alt="plugin box image">
         <span class="version">{{ translations.version }} {{ plugin.info.version }}</span>
@@ -50,8 +50,8 @@ export const dashboardPlugins: any = Vue.extend( {
                 <a href="#" :disabled="plugins[index].installing" @click="handlePlugin( $event, index )" class="button"> {{ pluginAction( index ) }} </a>
             </span>
         </template>
-    </div>
-  </div>
+      </div>
+    </transition-group>
   `,
   methods: {
     /**

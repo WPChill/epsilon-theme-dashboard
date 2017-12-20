@@ -30,6 +30,25 @@ export const mutations = {
    */
   changeTab( state: any, index: number ) {
     state.activeTab = index;
+
+    let fetchObj: EpsilonFetchTranslator,
+        data = {
+          action: 'epsilon_dashboard_ajax_callback',
+          nonce: state.ajax_nonce,
+          args: {
+            action: [ 'Epsilon_Dashboard_Helper', 'set_user_meta' ],
+            nonce: state.ajax_nonce,
+            args: {
+              tab: index,
+              option: 'epsilon_active_tab',
+            },
+          },
+        };
+
+    fetchObj = new EpsilonFetchTranslator( data );
+    fetch( ajaxurl, fetchObj ).then( function( res ) {
+      return res.json();
+    } );
   },
   /**
    * Update license key
@@ -46,6 +65,17 @@ export const mutations = {
    */
   updateLicenseStatus( state: any, value: string ) {
     state.edd.status = value;
+  },
+  /**
+   * Updates privacy status
+   *
+   * @param state
+   * @param args
+   */
+  updatePrivacyStatus( state: any, args: { id: string, status: boolean } ) {
+    if ( 'undefined' !== typeof state.privacy[ args.id ] ) {
+      state.privacy[ args.id ] = args.status;
+    }
   },
   /**
    * Sets imported flag

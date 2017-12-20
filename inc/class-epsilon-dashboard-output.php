@@ -138,6 +138,7 @@ class Epsilon_Dashboard_Output {
 			array(
 				'ajax_nonce'   => wp_create_nonce( 'epsilon_dashboard_nonce' ),
 				'theme'        => $theme,
+				'activeTab'    => 0,
 				'translations' => array(
 					'select'             => esc_html__( 'Select', 'epsilon-framework' ),
 					'import'             => esc_html__( 'Import', 'epsilon-framework' ),

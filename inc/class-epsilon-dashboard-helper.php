@@ -193,4 +193,17 @@ class Epsilon_Dashboard_Helper {
 			'demos'  => $importer->demos_js,
 		);
 	}
+
+	/**
+	 * Setup the user meta ( Instead of using cookies, we can use the user meta )
+	 *
+	 * @param array $args
+	 *
+	 * @return string;
+	 */
+	public static function set_user_meta( $args = array() ) {
+		update_user_meta( get_current_user_id(), $args['option'], absint( $args['tab'] ) );
+
+		return 'ok';
+	}
 }

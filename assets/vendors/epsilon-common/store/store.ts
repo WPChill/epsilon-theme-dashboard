@@ -9,7 +9,6 @@ Vue.use( Vuex );
 
 const state = EpsilonDashboard;
 
-state.activeTab = 0;
 state.importedDemo = false;
 
 export default new Vuex.Store( {
