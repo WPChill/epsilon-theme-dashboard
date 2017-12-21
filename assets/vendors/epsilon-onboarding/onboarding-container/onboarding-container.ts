@@ -39,6 +39,16 @@ export const onboardingContainer: any = Vue.extend( {
        * Page count
        */
       stepCount: 0,
+      /**
+       * Translation object
+       */
+      translations: {
+        notNow: this.$store.state.translations.notNow,
+      },
+      /**
+       * Admin Url
+       */
+      adminUrl: this.$store.state.adminUrl,
     };
   },
   /**
@@ -73,6 +83,7 @@ export const onboardingContainer: any = Vue.extend( {
    * Template
    */
   template: `
+      <div class="epsilon-onboarding-wrapper">
         <div class="epsilon-onboarding-container" v-bind:class="{ hasProgress: 0 < currentStep }">
             <transition name="tray">
                 <onboarding-progress v-show="0 < currentStep" :info="{steps: steps}"></onboarding-progress>
@@ -81,6 +92,8 @@ export const onboardingContainer: any = Vue.extend( {
                 <onboarding-step v-bind:class="{ active: index === currentStep }" v-bind:index="index" v-bind:info="step"></onboarding-step>
             </template>
         </div>
+        <a :href="adminUrl" class="button button-link">{{ translations.notNow }}</a>
+      </div>
     `,
   /**
    * Before mount lifecycle hook

@@ -142,8 +142,9 @@ class Epsilon_Dashboard {
 	 */
 	public function init_onboarding() {
 		if ( ! empty( $_GET ) && isset( $_GET['page'] ) && 'epsilon-onboarding' === $_GET['page'] ) {
-			new Epsilon_Onboarding(
+			new Epsilon_Onboarding_Output(
 				array(
+					'theme'   => $this->theme,
 					'plugins' => $this->plugins,
 					'actions' => $this->actions,
 					'steps'   => $this->steps,

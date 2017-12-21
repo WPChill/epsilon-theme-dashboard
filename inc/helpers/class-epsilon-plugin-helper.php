@@ -68,7 +68,7 @@ class Epsilon_Plugin_Helper {
 		$arr = array();
 
 		foreach ( $this->plugins as $plugin => $recommended ) {
-			$arr[] = $this->get_plugin_information( $plugin, $recommended['recommended'] );
+			$arr[] = $this->get_plugin_information( $plugin, $recommended['recommended'], $recommended['integration'] );
 		}
 
 		return $arr;
@@ -79,16 +79,18 @@ class Epsilon_Plugin_Helper {
 	 *
 	 * @param string $slug        Plugin slug.
 	 * @param string $recommended Recommended flag
+	 * @param string $integration Integration flag
 	 *
 	 * @return array
 	 */
-	private function get_plugin_information( $slug = '', $recommended = '' ) {
+	private function get_plugin_information( $slug = '', $recommended = '', $integration = '' ) {
 		$arr = array(
 			'id'          => $slug,
 			'info'        => $this->call_plugin_api( $slug ),
 			'url'         => null,
 			'state'       => 'waiting',
 			'recommended' => '1' === $recommended ? true : false,
+			'integration' => '1' === $integration ? true : false,
 			'installing'  => false,
 		);
 

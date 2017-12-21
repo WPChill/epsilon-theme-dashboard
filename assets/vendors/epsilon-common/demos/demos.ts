@@ -23,6 +23,7 @@ export const dashboardDemos: any = Vue.extend( {
    */
   data: function() {
     return {
+      entrypoint: this.$store.state.entrypoint,
       translations: {
         contentImported: this.$store.state.translations.contentImported,
         waitImport: this.$store.state.translations.waitImport,
@@ -148,6 +149,13 @@ export const dashboardDemos: any = Vue.extend( {
     installPlugins( demoIndex: number, contentId: string ) {
       const self = this;
       let plugins;
+
+      if ( 'onboarding' === self.entrypoint ) {
+        self.installerQueue = null;
+        self.pluginsFinished = true;
+        self.$store.commit( 'setImportedFlag', true );
+        return;
+      }
 
       for ( let i = 0; i < this.availableDemos[ demoIndex ].content.length; i ++ ) {
         if ( contentId === this.availableDemos[ demoIndex ].content[ i ].id ) {
@@ -464,7 +472,7 @@ export const dashboardDemos: any = Vue.extend( {
             action: [ 'Epsilon_Dashboard_Helper', 'get_demos' ],
             nonce: this.$store.state.ajax_nonce,
             args: {
-              path: this.path
+              path: this.path,
             },
           },
         };

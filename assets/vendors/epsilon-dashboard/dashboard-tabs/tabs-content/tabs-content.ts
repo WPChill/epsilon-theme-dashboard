@@ -69,7 +69,7 @@ export const dashboardTabsContent: any = Vue.extend( {
             </template>
             
             <template v-else-if="tab.type === 'plugins'">
-                <plugins></plugins>
+                <plugins :expanded="true"></plugins>
             </template>
             
             <template v-else-if="tab.type === 'registration'">

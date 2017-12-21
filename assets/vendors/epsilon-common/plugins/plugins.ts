@@ -22,35 +22,63 @@ export const dashboardPlugins: any = Vue.extend( {
         activating: this.$store.state.translations.activating,
         version: this.$store.state.translations.version,
         recommended: this.$store.state.translations.recommended,
+        integration: this.$store.state.translations.integration,
       },
       plugins: [],
     };
   },
   /**
+   * Props component
+   */
+  props: [ 'expanded' ],
+  /**
    * Template part
    */
   template: `
     <transition-group tag="div" name="demo-complete" class="row">
-      <div class="col epsilon-plugin-box demo-complete-item" v-for="(plugin, index) in plugins" :key="index">
-        <span v-if="plugin.recommended" class="epsilon-plugin-box--recommended">{{ translations.recommended }}</span>
-        <img :src="plugin.icon" alt="plugin box image">
-        <span class="version">{{ translations.version }} {{ plugin.info.version }}</span>
-        <span class="separator">|</span> <span v-html="plugin.info.author"></span>
-        
-        <div class="epsilon-plugin-box--action-bar">
-            <span class="plugin_name"><span v-html="plugin.info.name"></span></span>            
+      <template v-if="expanded">
+        <div class="col epsilon-plugin-box demo-complete-item" v-for="(plugin, index) in plugins" :key="index">
+          <span v-if="plugin.recommended" class="epsilon-plugin-box--recommended">{{ translations.recommended }}</span>
+          <span v-else-if="plugin.integration" class="epsilon-plugin-box--recommended">{{ translations.integration }}</span>
+          <img :src="plugin.icon" alt="plugin box image">
+          <span class="version">{{ translations.version }} {{ plugin.info.version }}</span>
+          <span class="separator">|</span> <span v-html="plugin.info.author"></span>
+          
+          <div class="epsilon-plugin-box--action-bar">
+              <span class="plugin_name"><span v-html="plugin.info.name"></span></span>            
+          </div>
+          <template v-if="plugins[index].active">
+              <span class="epsilon-plugin-box--action-button completed">
+                  <span class="dashicons dashicons-yes"></span>
+              </span>
+          </template>
+          <template v-else>
+              <span class="epsilon-plugin-box--action-button">
+                  <a href="#" :disabled="plugins[index].installing" @click="handlePlugin( $event, index )" class="button"> {{ pluginAction( index ) }} </a>
+              </span>
+          </template>
         </div>
-        <template v-if="plugins[index].active">
+      </template>
+      <template v-else>
+        <div class="epsilon-minimal-plugin-box demo-complete-item" v-for="(plugin, index) in plugins" :key="index">
+          <span v-html="plugin.info.name"></span>
+          <em class="epsilon-highlighted">
+              <span v-if="plugin.recommended">( {{ translations.recommended }} )</span>
+              <span v-else-if="plugin.integration">( {{ translations.integration }} )</span>
+          </em>
+          
+          <template v-if="plugins[index].active">
             <span class="epsilon-plugin-box--action-button completed">
                 <span class="dashicons dashicons-yes"></span>
             </span>
-        </template>
-        <template v-else>
+          </template>
+          <template v-else>
             <span class="epsilon-plugin-box--action-button">
                 <a href="#" :disabled="plugins[index].installing" @click="handlePlugin( $event, index )" class="button"> {{ pluginAction( index ) }} </a>
             </span>
-        </template>
-      </div>
+          </template>
+        </div>
+      </template>
     </transition-group>
   `,
   methods: {

@@ -1,8 +1,14 @@
+import { dashboardPluginsQueue } from '../epsilon-common/plugins-queue/plugins-queue';
+
 declare let require: any, wp: any;
-import * as $ from 'jquery';
 import Vue from 'vue';
+import Store from './store/store';
+
 import './onboarding.scss';
+import { dashboardDemos } from '../epsilon-common/demos/demos';
 import { onboardingContainer } from './onboarding-container/onboarding-container';
+import { epsilonToggle } from '../epsilon-common/epsilon-fields/epsilon-toggle/epsilon-toggle';
+import { dashboardPlugins } from '../epsilon-common/plugins/plugins';
 
 const epsilonOnboardingVue = new Vue( {
   /**
@@ -10,10 +16,18 @@ const epsilonOnboardingVue = new Vue( {
    */
   el: '#epsilon-onboarding-app',
   /**
+   * Store
+   */
+  store: Store,
+  /**
    * App components
    */
   components: {
     'onboarding-container': onboardingContainer,
+    'plugins' : dashboardPlugins,
+    'plugins-queue': dashboardPluginsQueue,
+    'demos': dashboardDemos,
+    'epsilon-toggle': epsilonToggle,
   },
   /**
    * Template

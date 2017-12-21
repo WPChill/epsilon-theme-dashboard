@@ -1,7 +1,7 @@
 import './steps.scss';
 import Vue from 'vue';
 
-declare let EpsilonOnboarding: any, wp: any;
+declare let EpsilonOnboarding: any, wp: any, window: any;
 
 /**
  * Onboarding step
@@ -27,13 +27,21 @@ export const onboardingStep: any = Vue.extend( {
    * Page template
    */
   template: `
-    <div class="onboarding-step" :data-index="index">
+    <div class="onboarding-step" :id="'epsilon-' + info.id" :data-index="index">
       <h2>
       {{ info.title }}
       </h2>
       <p>
       {{ info.contents }}
       </p>
+      
+      <template v-if="info.id === 'plugins'">
+        <plugins-queue></plugins-queue>
+      </template>
+      
+      <template v-if="info.id === 'demos'">
+        <demos :path="info.demos" ></demos>
+      </template>
       
       <div class="epsilon-buttons">
         <template v-for="button in info.buttons">
@@ -55,6 +63,11 @@ export const onboardingStep: any = Vue.extend( {
      */
     changeStep: function( e: Event, action: string, index: number ) {
       e.preventDefault();
+      if ( 'finish' === action ) {
+        window.location = this.$store.state.adminUrl;
+        return;
+      }
+
       this.$root.$emit( 'change-step', { action: action, from: index } );
     }
   },

@@ -10,9 +10,9 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Class Epsilon_Onboarding
+ * Class Epsilon_Onboarding_Output
  */
-class Epsilon_Onboarding {
+class Epsilon_Onboarding_Output {
 	/**
 	 * Recommended plugins
 	 *
@@ -25,6 +25,12 @@ class Epsilon_Onboarding {
 	 * @var array
 	 */
 	public $steps = array();
+	/**
+	 * Theme
+	 *
+	 * @var array
+	 */
+	public $theme = array();
 
 	/**
 	 * Epsilon_Onboarding constructor.
@@ -39,6 +45,7 @@ class Epsilon_Onboarding {
 				array(
 					'steps',
 					'plugins',
+					'theme',
 				)
 			)
 			) {
@@ -79,6 +86,10 @@ class Epsilon_Onboarding {
 	 * Enqueue function
 	 */
 	public function enqueue() {
+		wp_enqueue_style( 'plugin-install' );
+		wp_enqueue_script( 'plugin-install' );
+		wp_enqueue_script( 'updates' );
+
 		wp_enqueue_style(
 			'epsilon-onboarding',
 			get_template_directory_uri() . '/inc/libraries/epsilon-theme-dashboard/assets/css/onboarding.css'
@@ -107,8 +118,31 @@ class Epsilon_Onboarding {
 		return apply_filters(
 			'epsilon-onboarding-setup',
 			array(
-				'ajax_nonce' => wp_create_nonce( 'epsilon_dashboard_nonce' ),
-				'steps'      => $this->steps,
+				/**
+				 * App entry point
+				 */
+				'entrypoint'   => 'onboarding',
+				/**
+				 * Security nonce
+				 */
+				'ajax_nonce'   => wp_create_nonce( 'epsilon_dashboard_nonce' ),
+				/**
+				 * Admin url
+				 */
+				'adminUrl'     => get_admin_url(),
+				/**
+				 * Theme variables and usual translations
+				 */
+				'theme'        => Epsilon_Dashboard_Translations::get_theme_array( $this->theme ),
+				'translations' => Epsilon_Dashboard_Translations::get_usual_strings(),
+				/**
+				 * Onboarding steps
+				 */
+				'steps'        => $this->steps,
+				/**
+				 * Plugins that should be installed
+				 */
+				'plugins'      => $this->plugins,
 			)
 		);
 	}

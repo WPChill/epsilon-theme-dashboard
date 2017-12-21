@@ -11,7 +11,7 @@ import { dashboardOptionPage } from '../epsilon-common/option-page/option-page';
 import { dashboardComparisonTables } from '../epsilon-common/comparison-table/comparison-table';
 import { epsilonToggle } from '../epsilon-common/epsilon-fields/epsilon-toggle/epsilon-toggle';
 
-import Store from '../epsilon-common/store/store';
+import Store from './store/store';
 
 const epsilonDashboardVue = new Vue( {
   /**
