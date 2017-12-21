@@ -73,6 +73,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
      * @param {number} index
      */
     removeAction: function( index: number ) {
+      console.log( index );
       this.$store.commit( 'removeAction', index );
     },
     /**
@@ -250,6 +251,12 @@ export const dashboardRecommendedActions: any = Vue.extend( {
      */
     checkOptionVisibility: function() {
       const self = this;
+      this.actions.map( function( element: any, index: number ) {
+        if ( true === element.check ) {
+          self.$store.commit( 'removeActionById', element.id );
+        }
+      } );
+
       let fetchObj: EpsilonFetchTranslator,
           data = {
             action: 'epsilon_dashboard_ajax_callback',
@@ -273,7 +280,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
           for ( let key in json.option ) {
             self.actions.map( function( element: any, index: number ) {
               if ( element.id === key ) {
-                self.removeAction( index );
+                self.$store.commit( 'removeActionById', element.id );
               }
             } );
           }
@@ -321,19 +328,11 @@ export const dashboardRecommendedActions: any = Vue.extend( {
    */
   beforeMount: function() {
     const self = this;
-    let arrayToRemove: Array<number> = [];
+
     this.actions.map( function( element: any, index: number ) {
       element.visible = true;
       element.actions.push( { label: self.translations.skipAction, type: 'skip-action', handler: null } );
-
-      if ( element.check || '1' === element.check ) {
-        arrayToRemove.push( index );
-      }
     } );
-
-    for ( let i = 0; i < arrayToRemove.length; i ++ ) {
-      self.removeAction( arrayToRemove[ i ] );
-    }
 
     self.checkOptionVisibility();
   }

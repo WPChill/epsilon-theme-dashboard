@@ -24,6 +24,16 @@ export const mutations = {
     state.actions.splice( index, 1 );
   },
   /**
+   * Removes action by id
+   * @param state
+   * @param {string} id
+   */
+  removeActionById( state: any, id: string ) {
+    state.actions = state.actions.filter( function( element: any ) {
+      return id !== element.id;
+    } );
+  },
+  /**
    * Sets the current tab
    * @param state
    * @param {number} index
