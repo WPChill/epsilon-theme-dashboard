@@ -50,7 +50,6 @@ export const dashboardRecommendedActions: any = Vue.extend( {
                 </transition>
             </span>
           </template>
-          
           <h4>{{ action.title }}</h4>
           <p>{{ action.description }}</p>
           <div class="action-initiators" v-if="action.actions">
@@ -88,7 +87,7 @@ export const dashboardRecommendedActions: any = Vue.extend( {
             args: {
               action: [ 'Epsilon_Dashboard_Helper', 'create_plugin_activation_link' ],
               nonce: this.$store.state.ajax_nonce,
-              args: { slug: this.actions[ actionIndex ].plugin_slug },
+              args: { slug: this.actions[ index ].plugin_slug },
             },
           };
 
