@@ -151,9 +151,6 @@ export const dashboardDemos: any = Vue.extend( {
       let plugins;
 
       if ( 'onboarding' === self.entrypoint ) {
-        self.installerQueue = null;
-        self.pluginsFinished = true;
-        self.$store.commit( 'setImportedFlag', true );
         return;
       }
 
@@ -367,6 +364,19 @@ export const dashboardDemos: any = Vue.extend( {
       } );
     },
     /**
+     * Remove plugins during onboarding, should be installed a step back
+     */
+    removePlugins: function() {
+      let key: string;
+      for ( key in this.availableDemos ) {
+        for ( let i = 0; i < this.availableDemos[ key ].content.length; i ++ ) {
+          if ( 'plugins' === this.availableDemos[ key ].content[ i ].id ) {
+            this.availableDemos[ key ].content.splice( i, 1 );
+          }
+        }
+      }
+    },
+    /**
      * Checks if the demo is installed
      */
     checkAlreadyInstalled: function() {
@@ -509,6 +519,12 @@ export const dashboardDemos: any = Vue.extend( {
         }
 
         self.removeDupes( 'pluginsInstalled' );
+        /**
+         * Remove plugins if we`re in onboarding
+         */
+        if ( 'onboarding' === self.entrypoint ) {
+          self.removePlugins();
+        }
       }
     } );
   },
