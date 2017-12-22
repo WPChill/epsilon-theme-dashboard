@@ -9,6 +9,7 @@ import { dashboardDemos } from '../epsilon-common/demos/demos';
 import { onboardingContainer } from './onboarding-container/onboarding-container';
 import { epsilonToggle } from '../epsilon-common/epsilon-fields/epsilon-toggle/epsilon-toggle';
 import { dashboardPlugins } from '../epsilon-common/plugins/plugins';
+import { dashboardOptionPage } from '../epsilon-common/option-page/option-page';
 
 const epsilonOnboardingVue = new Vue( {
   /**
@@ -24,9 +25,10 @@ const epsilonOnboardingVue = new Vue( {
    */
   components: {
     'onboarding-container': onboardingContainer,
-    'plugins' : dashboardPlugins,
+    'plugins': dashboardPlugins,
     'plugins-queue': dashboardPluginsQueue,
     'demos': dashboardDemos,
+    'option-page': dashboardOptionPage,
     'epsilon-toggle': epsilonToggle,
   },
   /**

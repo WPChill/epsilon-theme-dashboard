@@ -100,7 +100,7 @@ class EDD_Theme_Helper {
 
 		if ( isset( $license_data->expires ) ) {
 			$expires    = date_i18n( get_option( 'date_format' ), strtotime( $license_data->expires ) );
-			$renew_link = '<a href="' . esc_url( self::get_renewal_link() ) . '" target="_blank">' . $strings['renew'] . '</a>';
+			$renew_link = '<a href="' . esc_url( self::get_renewal_link( $args['theme']['theme-slug'], $license ) ) . '" target="_blank">' . $strings['renew'] . '</a>';
 		}
 
 		$arr = array(
@@ -124,8 +124,15 @@ class EDD_Theme_Helper {
 	 *
 	 * @return string
 	 */
-	public static function get_renewal_link() {
-		$theme = wp_get_theme();
+	public static function get_renewal_link( $slug = '', $license = '' ) {
+		$theme    = wp_get_theme();
+		$instance = Epsilon_Dashboard::get_instance();
+		if ( '' !== $instance->theme['download-id'] && ! empty( $license ) ) {
+			$url = esc_url( $theme->get( 'AuthorURI' ) );
+			$url .= '/checkout/?edd_license_key=' . $license . '&download_id=' . $instance->theme['download-id'];
+
+			return $url;
+		}
 
 		return $theme->get( 'AuthorURI' );
 	}

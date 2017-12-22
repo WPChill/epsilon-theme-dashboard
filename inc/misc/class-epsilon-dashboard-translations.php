@@ -44,7 +44,7 @@ class Epsilon_Dashboard_Translations {
 			'expires'            => esc_html__( 'Expires: ', 'epsilon-framework' ),
 			'status'             => esc_html__( 'License Status: ', 'epsilon-framework' ),
 			'installPlugins'     => esc_html__( 'Install Plugins', 'epsilon-framework' ),
-			'notNow'             => esc_html__( 'Now right now!', 'epsilon-framework' ),
+			'notNow'             => esc_html__( 'Not right now!', 'epsilon-framework' ),
 		);
 	}
 

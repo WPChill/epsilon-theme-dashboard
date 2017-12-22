@@ -1,7 +1,7 @@
 import './steps.scss';
 import Vue from 'vue';
 
-declare let EpsilonOnboarding: any, wp: any, window: any;
+declare let wp: any, window: any;
 
 /**
  * Onboarding step
@@ -41,6 +41,10 @@ export const onboardingStep: any = Vue.extend( {
       
       <template v-if="info.id === 'demos'">
         <demos :path="info.demos" ></demos>
+      </template>
+      
+      <template v-if="info.fields">
+        <option-page :fields="info.fields"></option-page>
       </template>
       
       <div class="epsilon-buttons">

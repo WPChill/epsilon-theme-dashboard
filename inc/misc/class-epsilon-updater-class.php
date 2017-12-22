@@ -99,11 +99,42 @@ class Epsilon_Updater_Class {
 		$this->response_key   = $this->theme_slug . '-update-response';
 		$this->strings        = EDD_Theme_Helper::get_strings();
 
+		/**
+		 * Initiate EDD Stuff
+		 */
+		add_filter( 'http_request_args', array( $this, 'disable_wporg_request' ), 5, 2 );
+
 		add_filter( 'site_transient_update_themes', array( $this, 'product_update_transient' ) );
 		add_filter( 'delete_site_transient_update_themes', array( $this, 'delete_product_update_transient' ) );
 		add_action( 'load-update-core.php', array( $this, 'delete_product_update_transient' ) );
 		add_action( 'load-themes.php', array( $this, 'delete_product_update_transient' ) );
 		add_action( 'load-themes.php', array( $this, 'load_themes_screen' ) );
+	}
+
+
+	/**
+	 * We need to disable wporg requests at this time
+	 *
+	 * @param object $r   Request object.
+	 * @param string $url URL String.
+	 *
+	 * @return mixed
+	 */
+	public function disable_wporg_request( $r, $url ) {
+		// If it's not a theme update request, bail.
+		if ( 0 !== strpos( $url, 'https://api.wordpress.org/themes/update-check/1.1/' ) ) {
+			return $r;
+		}
+		// Decode the JSON response.
+		$themes = json_decode( $r['body']['themes'] );
+		// Remove the active parent and child themes from the check.
+		$parent = get_option( 'template' );
+		$child  = get_option( 'stylesheet' );
+		unset( $themes->themes->$parent );
+		unset( $themes->themes->$child );
+		// Encode the updated JSON response.
+		$r['body']['themes'] = wp_json_encode( $themes );
+		return $r;
 	}
 
 	/**

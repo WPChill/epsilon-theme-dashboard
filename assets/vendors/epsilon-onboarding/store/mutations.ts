@@ -13,8 +13,18 @@ export const mutations = {
    * @param slug
    */
   setPluginInstalled( state: any, slug: string ) {
-    console.log( slug );
     state.plugins[ slug ].installed = true;
+  },
+  /**
+   * Updates privacy status
+   *
+   * @param state
+   * @param args
+   */
+  updatePrivacyStatus( state: any, args: { id: string, status: boolean } ) {
+    if ( 'undefined' !== typeof state.privacy[ args.id ] ) {
+      state.privacy[ args.id ] = args.status;
+    }
   },
   /**
    * Sets imported flag

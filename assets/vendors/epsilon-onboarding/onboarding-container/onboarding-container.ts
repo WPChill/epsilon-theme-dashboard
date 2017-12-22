@@ -59,8 +59,8 @@ export const onboardingContainer: any = Vue.extend( {
      * Get onboarding pages
      */
     getSteps: function(): void {
-      this.steps = EpsilonOnboarding.steps;
-      this.stepCount = EpsilonOnboarding.steps.length;
+      this.steps = this.$store.state.steps;
+      this.stepCount = this.$store.state.steps.length;
     },
     /**
      * Change page action

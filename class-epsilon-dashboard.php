@@ -42,17 +42,17 @@ class Epsilon_Dashboard {
 	 */
 	public $steps = array();
 	/**
+	 * Theme
+	 *
+	 * @var array
+	 */
+	public $theme = array();
+	/**
 	 * Does the theme support "onboarding" ?
 	 *
 	 * @var bool
 	 */
 	protected $onboarding = true;
-	/**
-	 * Theme
-	 *
-	 * @var array
-	 */
-	protected $theme = array();
 
 	/**
 	 * Class constructor
@@ -82,15 +82,15 @@ class Epsilon_Dashboard {
 			$this->$k = $v;
 		}
 
-		$theme       = wp_get_theme();
-		$arr         = array(
+		$theme = wp_get_theme();
+		$arr   = array(
 			'theme-name'    => $theme->get( 'Name' ),
 			'theme-slug'    => $theme->get( 'TextDomain' ),
 			'theme-version' => $theme->get( 'Version' ),
+			'download-id'   => null,
 		);
+
 		$this->theme = wp_parse_args( $this->theme, $arr );
-
-
 		$this->init_dashboard();
 
 		if ( $this->onboarding ) {
@@ -98,6 +98,10 @@ class Epsilon_Dashboard {
 		}
 
 		$this->init_ajax();
+		/**
+		 * Initiate theme updater
+		 */
+		$this->init_updater();
 	}
 
 	/**
@@ -114,6 +118,29 @@ class Epsilon_Dashboard {
 		}
 
 		return $inst;
+	}
+
+	/**
+	 * Check if we have a valid license and if so, initiate the updater class
+	 */
+	public function init_updater() {
+		/**
+		 * In case we don`t have a valid license, return here
+		 */
+		$licensing = get_option( $this->theme['theme-slug'] . '_license_object', array() );
+		if ( empty( $licensing ) ) {
+			return;
+		}
+
+		if ( empty( $licensing['licenseStatus'] ) || 'valid' !== $licensing['licenseStatus'] ) {
+			return;
+		}
+
+		$arr = array(
+			'license' => $licensing['licenseStatus'],
+		);
+
+		new Epsilon_Updater_Class( $arr );
 	}
 
 	/**

@@ -12,4 +12,11 @@ export const getters = {
   getImportStatus: function( state: any ) {
     return state.importedDemo;
   },
+  /**
+   * Gets the field value based on a "relation"
+   * @param state
+   */
+  getFieldRelation: ( state: any ) => ( id: string ) => {
+    return state.privacy[ id ];
+  }
 };
