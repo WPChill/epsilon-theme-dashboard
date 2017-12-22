@@ -525,6 +525,10 @@ export const dashboardDemos: any = Vue.extend( {
         if ( 'onboarding' === self.entrypoint ) {
           self.removePlugins();
         }
+
+        if ( self.availableDemos.length === 1 ) {
+          self.selectDemo( 0 );
+        }
       }
     } );
   },

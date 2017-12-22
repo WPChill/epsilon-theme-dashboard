@@ -31,9 +31,7 @@ export const onboardingStep: any = Vue.extend( {
       <h2>
       {{ info.title }}
       </h2>
-      <p>
-      {{ info.contents }}
-      </p>
+      <p v-for="paragraph in info.content.paragraphs" v-html="paragraph"></p>
       
       <template v-if="info.id === 'plugins'">
         <plugins-queue></plugins-queue>
@@ -69,6 +67,11 @@ export const onboardingStep: any = Vue.extend( {
       e.preventDefault();
       if ( 'finish' === action ) {
         window.location = this.$store.state.adminUrl;
+        return;
+      }
+
+      if ( 'customizer' === action ) {
+        window.location = this.$store.state.adminUrl + '/customize.php';
         return;
       }
 
