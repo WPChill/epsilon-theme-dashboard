@@ -34,10 +34,14 @@ class Epsilon_Dashboard {
 	 */
 	public $demos = array();
 	/**
+	 * Tabs created by the dashboard
+	 *
 	 * @var array tabs
 	 */
 	public $tabs = array();
 	/**
+	 * Onboarding steps
+	 *
 	 * @var array
 	 */
 	public $steps = array();
@@ -62,16 +66,41 @@ class Epsilon_Dashboard {
 	 * @param array $args
 	 */
 	public function __construct( $args = array() ) {
+		/**
+		 * Basic constructor
+		 */
 		foreach ( $args as $k => $v ) {
 
 			if ( ! in_array(
 				$k,
 				array(
+					/**
+					 * Actions
+					 */
 					'actions',
+					/**
+					 * Plugins
+					 */
 					'plugins',
+					/**
+					 * Demos ( CAN BE MULTIPLE )
+					 */
 					'demos',
+					/**
+					 * Theme array
+					 */
 					'theme',
+					/**
+					 * Do we support onboarding ?
+					 */
 					'onboarding',
+					/**
+					 * Onboarding steps
+					 */
+					'steps',
+					/**
+					 * How many tabs do we have ?
+					 */
 					'tabs',
 				)
 			)
@@ -83,25 +112,39 @@ class Epsilon_Dashboard {
 		}
 
 		$theme = wp_get_theme();
-		$arr   = array(
-			'theme-name'    => $theme->get( 'Name' ),
-			'theme-slug'    => $theme->get( 'TextDomain' ),
-			'theme-version' => $theme->get( 'Version' ),
-			'download-id'   => null,
+
+		$this->theme = wp_parse_args(
+			$this->theme,
+			array(
+				'theme-name'    => $theme->get( 'Name' ),
+				'theme-slug'    => $theme->get( 'TextDomain' ),
+				'theme-version' => $theme->get( 'Version' ),
+				'download-id'   => null,
+			)
 		);
 
-		$this->theme = wp_parse_args( $this->theme, $arr );
+		/**
+		 * Initiate the dashboard
+		 */
 		$this->init_dashboard();
-
+		/**
+		 * Do we have onboarding enabled?
+		 */
 		if ( $this->onboarding ) {
 			$this->init_onboarding();
 		}
-
+		/**
+		 * Init ajax controller
+		 */
 		$this->init_ajax();
 		/**
 		 * Initiate theme updater
 		 */
 		$this->init_updater();
+		/**
+		 * Initiate customer tracking
+		 */
+		$this->init_tracking();
 	}
 
 	/**
@@ -178,5 +221,12 @@ class Epsilon_Dashboard {
 				)
 			);
 		}
+	}
+
+	/**
+	 * Initiate customer tracking ( CAN BE TOGGLED OFF )
+	 */
+	public function init_tracking() {
+		new Epsilon_Customer_Tracking();
 	}
 }
