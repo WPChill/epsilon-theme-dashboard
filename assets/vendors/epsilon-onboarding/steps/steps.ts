@@ -1,5 +1,6 @@
 import './steps.scss';
 import Vue from 'vue';
+import { EpsilonFetchTranslator } from '../../epsilon-fetch-translator';
 
 declare let wp: any, window: any;
 
@@ -71,12 +72,14 @@ export const onboardingStep: any = Vue.extend( {
       }
 
       if ( 'customizer' === action ) {
+        this.$store.commit( 'setOnboardingFlag', true );
         window.location = this.$store.state.adminUrl + '/customize.php';
         return;
       }
 
       this.$root.$emit( 'change-step', { action: action, from: index } );
-    }
+    },
+
   },
 } );
 Vue.component( 'onboarding-step', onboardingStep );

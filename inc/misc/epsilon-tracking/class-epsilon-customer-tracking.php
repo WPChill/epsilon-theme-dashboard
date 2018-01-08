@@ -33,27 +33,31 @@ class Epsilon_Customer_Tracking {
 	 */
 	private $data = array(
 		/**
+		 * Epsilon customer tracking
+		 */
+		'epsilon-customer-tracking' => true,
+		/**
 		 * Server data
 		 */
-		'server'    => array(),
+		'server'                    => array(),
 		/**
 		 * WordPress data
 		 */
-		'wordpress' => array(),
+		'wordpress'                 => array(),
 		/**
 		 * User data
 		 */
-		'user'      => array(),
+		'user'                      => array(),
 		/**
 		 * Behavior data
 		 */
-		'behavior'  => array(),
+		'behavior'                  => array(),
 	);
 
 	/**
 	 * Epsilon_Tracking constructor.
 	 *
-	 * @param $args Array
+	 * @param $args array
 	 */
 	public function __construct( $args = array() ) {
 		$this->allowed_tracking();
@@ -67,6 +71,22 @@ class Epsilon_Customer_Tracking {
 		}
 
 		$this->handle_data();
+	}
+
+	/**
+	 * Creates an instance of the customer tracking service
+	 *
+	 * @param array $args
+	 *
+	 * @return Epsilon_Customer_Tracking
+	 */
+	public static function get_instance( $args = array() ) {
+		static $inst;
+		if ( ! $inst ) {
+			$inst = new Epsilon_Customer_Tracking( $args );
+		}
+
+		return $inst;
 	}
 
 	/**

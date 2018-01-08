@@ -59,5 +59,39 @@ export const mutations = {
         }
       } );
     }
+  },
+  /**
+   * Sets imported flag
+   * @param state
+   * @param {boolean} change
+   */
+  setOnboardingFlag( state: any, change: boolean ) {
+    let temp: any = {};
+    temp[ state.theme[ 'theme-slug' ] + '_onboarding_used' ] = true;
+    state.importedDemo = true;
+    if ( change ) {
+      let fetchObj: EpsilonFetchTranslator,
+          data = {
+            action: 'epsilon_dashboard_ajax_callback',
+            nonce: state.ajax_nonce,
+            args: {
+              action: [ 'Epsilon_Dashboard_Helper', 'set_options' ],
+              nonce: state.ajax_nonce,
+              args: {
+                theme_mod: temp
+              },
+            },
+          };
+
+      fetchObj = new EpsilonFetchTranslator( data );
+
+      fetch( ajaxurl, fetchObj ).then( function( res ) {
+        return res.json();
+      } ).then( function( json ) {
+        if ( json.status && 'ok' === json.message ) {
+          return;
+        }
+      } );
+    }
   }
 };

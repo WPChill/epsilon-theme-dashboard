@@ -20,18 +20,32 @@ class Epsilon_Behavior_Tracking extends Epsilon_Tracking {
 	 * @return array
 	 */
 	public function generate_data() {
-		/**
-		 * @todo this should be taken from "options"
-		 */
-		return array(
-			'imported_demo'   => true,
-			'used_onboarding' => true,
+		$theme = get_stylesheet();
+		$arr   = array(
+			'imported_demo'   => get_theme_mod( $theme . '_content_imported', false ),
+			'used_onboarding' => get_theme_mod( $theme . '_onboarding_used', false ),
 			'privacy'         => array(
-				'lite_vs_pro'         => false,
-				'recommended_plugins' => true,
-				'recommended_actions' => true,
-				'theme_upsells'       => true,
+				'lite_vs_pro'         => get_option( $theme . '_lite_vs_pro', false ),
+				'recommended_plugins' => get_option( $theme . '_recommended_plugins', false ),
+				'recommended_actions' => get_option( $theme . '_recommended_actions', false ),
+				'theme_upsells'       => get_option( $theme . '_theme_upsells', false ),
 			),
 		);
+
+		foreach ( $arr as $k => $v ) {
+			if ( is_array( $v ) ) {
+				continue;
+			}
+
+			if ( in_array( $v, array( true, 1, '1' ) ) ) {
+				$arr[ $k ] = true;
+			}
+
+			if ( in_array( $v, array( false, 0, '0' ) ) ) {
+				$arr[ $v ] = false;
+			}
+		}
+
+		return $arr;
 	}
 }

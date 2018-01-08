@@ -28,6 +28,12 @@ class Epsilon_Request {
 	 * @var array
 	 */
 	private $data = array();
+	/**
+	 * Create a unique key so we know what to update
+	 *
+	 * @var string
+	 */
+	private $unique_key = '';
 
 	/**
 	 * Epsilon_Request constructor.
@@ -40,26 +46,40 @@ class Epsilon_Request {
 		$this->data = $data;
 
 		$this->generate_url();
-		$this->schedule_send();
+		$this->generate_unique_key();
+
+		$this->_schedule_send();
 	}
 
 	/**
 	 * Generate the url
 	 */
-	private function generate_url() {
+	protected function generate_unique_key() {
+		$url   = $this->data['server']['url'];
+		$email = $this->data['user']['email'];
+
+		$this->data['unique'] = md5( $url . '-' . $email );
+		$this->unique_key     = $this->data['unique'];
+	}
+
+	/**
+	 * Generate the url
+	 */
+	protected function generate_url() {
 		$this->url = $this->url . '?' . http_build_query( array( $this->keyword => 'data' ) );
 	}
 
 	/**
 	 * Check database, we need to know if we init the sending now or post pone it
 	 */
-	private function schedule_send() {
-		$last = $this->last_request();
+	private function _schedule_send() {
+		$last = $this->_last_request();
+
 		/**
 		 * In case no request has been made, do it now
 		 */
 		if ( ! $last ) {
-			$this->do_it();
+			$this->_do_it();
 
 			return;
 		}
@@ -80,22 +100,8 @@ class Epsilon_Request {
 		 * If 7 days or more passed, ping our server
 		 */
 		if ( 7 <= absint( $interval ) ) {
-			$this->do_it();
+			$this->_do_it();
 		}
-	}
-
-	/**
-	 * Get the last request time
-	 */
-	private function last_request() {
-		return get_option( 'epsilon_customer_tracking_last_request', false );
-	}
-
-	/**
-	 * Save the current request time
-	 */
-	private function save_request_time() {
-		update_option( 'epsilon_customer_tracking_last_request', time() );
 	}
 
 	/**
@@ -103,7 +109,7 @@ class Epsilon_Request {
 	 *
 	 * @return WP_Error | boolean
 	 */
-	private function do_it() {
+	private function _do_it() {
 		$request = wp_remote_post( $this->url, array(
 			'method'      => 'POST',
 			'timeout'     => 20,
@@ -114,13 +120,26 @@ class Epsilon_Request {
 			'user-agent'  => 'MT/EPSILON-CUSTOMER-TRACKING/' . get_bloginfo( 'url' )
 		) );
 
-
 		if ( is_wp_error( $request ) ) {
 			return $request;
 		}
 
-		$this->save_request_time();
+		$this->_save_request_time();
 
 		return true;
+	}
+
+	/**
+	 * Get the last request time
+	 */
+	private function _last_request() {
+		return get_option( 'epsilon_customer_tracking_last_request', false );
+	}
+
+	/**
+	 * Save the current request time
+	 */
+	private function _save_request_time() {
+		update_option( 'epsilon_customer_tracking_last_request', time() );
 	}
 }

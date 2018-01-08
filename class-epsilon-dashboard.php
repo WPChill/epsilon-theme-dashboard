@@ -227,6 +227,6 @@ class Epsilon_Dashboard {
 	 * Initiate customer tracking ( CAN BE TOGGLED OFF )
 	 */
 	public function init_tracking() {
-		new Epsilon_Customer_Tracking();
+		Epsilon_Customer_Tracking::get_instance();
 	}
 }
