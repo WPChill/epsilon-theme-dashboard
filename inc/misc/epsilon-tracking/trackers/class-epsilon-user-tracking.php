@@ -20,6 +20,14 @@ class Epsilon_User_Tracking extends Epsilon_Tracking {
 	public function generate_data() {
 		$admin = get_user_by( 'email', get_bloginfo( 'admin_email' ) );
 
+		if ( ! $admin ) {
+			return array(
+				'email'      => '',
+				'first_name' => '',
+				'last_name'  => '',
+			);
+		}
+
 		return array(
 			'email'      => get_bloginfo( 'admin_email' ),
 			'first_name' => $admin->first_name,

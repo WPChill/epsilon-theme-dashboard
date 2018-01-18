@@ -58,6 +58,8 @@ class Epsilon_Customer_Tracking {
 	 * Epsilon_Tracking constructor.
 	 *
 	 * @param $args array
+	 *
+	 * @return boolean
 	 */
 	public function __construct( $args = array() ) {
 		$this->allowed_tracking();
@@ -70,7 +72,12 @@ class Epsilon_Customer_Tracking {
 			$this->collect_data();
 		}
 
+		if ( empty( array_filter( $this->data['user'] ) ) ) {
+			return false;
+		}
+
 		$this->handle_data();
+		return true;
 	}
 
 	/**
