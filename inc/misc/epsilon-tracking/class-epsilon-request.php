@@ -17,11 +17,11 @@ class Epsilon_Request {
 	 */
 	private $url = '';
 	/**
-	 * Keyword for the url
+	 * Api endpoint
 	 *
 	 * @var string
 	 */
-	private $keyword = 'epsilon-customer-tracking';
+	private $endpoint = 'wp-json/epsilon/v1/add-tracking-data';
 	/**
 	 * Private data
 	 *
@@ -41,7 +41,7 @@ class Epsilon_Request {
 	 * @param string $url
 	 * @param array  $data
 	 */
-	public function __construct( $url = 'https://wwww.machothemes.com', $data = array() ) {
+	public function __construct( $url = 'https://tamewp.com/', $data = array() ) {
 		$this->url  = $url;
 		$this->data = $data;
 
@@ -58,15 +58,17 @@ class Epsilon_Request {
 		$url   = $this->data['server']['url'];
 		$email = $this->data['user']['email'];
 
-		$this->data['unique'] = md5( $url . '-' . $email );
-		$this->unique_key     = $this->data['unique'];
+		$this->data['unique']        = md5( $url . '-' . $email );
+		$this->data['first_request'] = strtotime( 'now' );
+
+		$this->unique_key = $this->data['unique'];
 	}
 
 	/**
 	 * Generate the url
 	 */
 	protected function generate_url() {
-		$this->url = $this->url . '?' . http_build_query( array( $this->keyword => 'data' ) );
+		$this->url = $this->url . $this->endpoint;
 	}
 
 	/**
@@ -74,7 +76,6 @@ class Epsilon_Request {
 	 */
 	private function _schedule_send() {
 		$last = $this->_last_request();
-
 		/**
 		 * In case no request has been made, do it now
 		 */
@@ -97,9 +98,9 @@ class Epsilon_Request {
 		 */
 		$interval = $today->diff( $last_request )->format( '%d' );
 		/**
-		 * If 7 days or more passed, ping our server
+		 * If 1 day or more passed, ping our server
 		 */
-		if ( 7 <= absint( $interval ) ) {
+		if ( 1 <= absint( $interval ) ) {
 			$this->_do_it();
 		}
 	}

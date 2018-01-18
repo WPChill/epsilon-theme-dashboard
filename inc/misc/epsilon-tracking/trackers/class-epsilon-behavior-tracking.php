@@ -42,7 +42,7 @@ class Epsilon_Behavior_Tracking extends Epsilon_Tracking {
 			}
 
 			if ( in_array( $v, array( false, 0, '0' ) ) ) {
-				$arr[ $v ] = false;
+				$arr[ $k ] = false;
 			}
 		}
 

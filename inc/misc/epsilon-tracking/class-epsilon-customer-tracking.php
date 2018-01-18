@@ -25,7 +25,7 @@ class Epsilon_Customer_Tracking {
 	 *
 	 * @var string
 	 */
-	private $url = 'https://www.machothemes.com/';
+	private $url = 'https://www.tamewp.com/';
 	/**
 	 * Data array
 	 *
