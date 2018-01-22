@@ -57,6 +57,12 @@ class Epsilon_Dashboard {
 	 * @var bool
 	 */
 	protected $onboarding = true;
+	/**
+	 * Tracking
+	 *
+	 * @var bool
+	 */
+	protected $tracking = '';
 
 	/**
 	 * Class constructor
@@ -102,6 +108,10 @@ class Epsilon_Dashboard {
 					 * How many tabs do we have ?
 					 */
 					'tabs',
+					/**
+					 * Do we allow tracking ?
+					 */
+					'tracking'
 				)
 			)
 			) {
@@ -227,6 +237,10 @@ class Epsilon_Dashboard {
 	 * Initiate customer tracking ( CAN BE TOGGLED OFF )
 	 */
 	public function init_tracking() {
-		Epsilon_Customer_Tracking::get_instance();
+		Epsilon_Customer_Tracking::get_instance(
+			array(
+				'tracking_option' => $this->tracking,
+			)
+		);
 	}
 }

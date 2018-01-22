@@ -21,6 +21,12 @@ class Epsilon_Customer_Tracking {
 	 */
 	private $allowed = true;
 	/**
+	 * Tracking option ( comes from dashboard )
+	 *
+	 * @var string
+	 */
+	protected $tracking_option = '';
+	/**
 	 * URL where we send data
 	 *
 	 * @var string
@@ -62,6 +68,8 @@ class Epsilon_Customer_Tracking {
 	 * @return boolean
 	 */
 	public function __construct( $args = array() ) {
+		$this->tracking_option = $args['tracking_option'];
+
 		$this->allowed_tracking();
 
 		if ( isset( $args['url'] ) ) {
@@ -77,6 +85,7 @@ class Epsilon_Customer_Tracking {
 		}
 
 		$this->handle_data();
+
 		return true;
 	}
 
@@ -100,7 +109,7 @@ class Epsilon_Customer_Tracking {
 	 * Let's see if we're allowed to track user data
 	 */
 	public function allowed_tracking() {
-		$allowed = get_option( 'epsilon_allowed_tracking', true );
+		$allowed = get_option( $this->tracking_option, true );
 
 		if ( in_array( $allowed, array( true, 1, '1' ) ) ) {
 			$this->allowed = true;
