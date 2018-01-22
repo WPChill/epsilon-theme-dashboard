@@ -91,7 +91,7 @@ class Epsilon_Updater_Class {
 
 		$this->license        = $args['license'];
 		$this->item_name      = $args['item_name'];
-		$this->version        = $args['Version'];
+		$this->version        = $args['version'];
 		$this->theme_slug     = $args['theme_slug'];
 		$this->remote_api_url = $args['remote_api_url'];
 		$this->author         = $args['author'];

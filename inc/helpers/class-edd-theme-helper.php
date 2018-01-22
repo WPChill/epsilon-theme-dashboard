@@ -150,11 +150,10 @@ class EDD_Theme_Helper {
 		$api_params = array(
 			'edd_action' => 'activate_license',
 			'license'    => $args['license'],
-			'item_name'  => rawurlencode( $args['theme']['theme-slug'] . '-pro' ),
+			'item_name'  => rawurlencode( $args['theme']['theme-slug'] ),
 		);
 
 		$license_data = self::get_api_response( $api_params );
-
 		if ( 'valid' === $license_data->license ) {
 			if ( isset( $license_data->expires ) ) {
 				$expires    = date_i18n( get_option( 'date_format' ), strtotime( $license_data->expires ) );
