@@ -23,7 +23,7 @@ class Epsilon_Behavior_Tracking extends Epsilon_Tracking {
 		$theme = get_stylesheet();
 		$arr   = array(
 			'imported_demo'   => get_theme_mod( $theme . '_content_imported', false ),
-			'used_onboarding' => get_theme_mod( $theme . '_onboarding_used', false ),
+			'used_onboarding' => get_theme_mod( $theme . '_used_onboarding', false ),
 			'privacy'         => array(
 				'lite_vs_pro'         => get_option( $theme . '_lite_vs_pro', false ),
 				'recommended_plugins' => get_option( $theme . '_recommended_plugins', false ),

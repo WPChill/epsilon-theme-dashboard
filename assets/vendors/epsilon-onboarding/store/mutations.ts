@@ -67,7 +67,7 @@ export const mutations = {
    */
   setOnboardingFlag( state: any, change: boolean ) {
     let temp: any = {};
-    temp[ state.theme[ 'theme-slug' ] + '_onboarding_used' ] = true;
+    temp[ state.theme[ 'theme-slug' ] + '_used_onboarding' ] = true;
     state.importedDemo = true;
     if ( change ) {
       let fetchObj: EpsilonFetchTranslator,
