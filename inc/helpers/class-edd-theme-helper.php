@@ -192,7 +192,7 @@ class EDD_Theme_Helper {
 		$api_params = array(
 			'edd_action' => 'deactivate_license',
 			'license'    => $args['license'],
-			'item_name'  => rawurlencode( $args['theme']['theme-slug'] . '-pro' ),
+			'item_name'  => rawurlencode( $args['theme']['theme-slug'] ),
 		);
 
 		$license_data = self::get_api_response( $api_params );
