@@ -10,6 +10,7 @@ Vue.use( Vuex );
 const state = EpsilonOnboarding;
 
 state.importedDemo = false;
+state.onboardingStatus = false;
 
 export default new Vuex.Store( {
   state,

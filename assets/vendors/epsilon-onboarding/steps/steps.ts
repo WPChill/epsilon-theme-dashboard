@@ -25,6 +25,14 @@ export const onboardingStep: any = Vue.extend( {
     return {};
   },
   /**
+   * Computed data
+   */
+  computed: {
+    usedOnboarding: function() {
+      return this.$store.getters.getOnboardingStatus;
+    }
+  },
+  /**
    * Page template
    */
   template: `
@@ -65,6 +73,7 @@ export const onboardingStep: any = Vue.extend( {
      * @param {number} index
      */
     changeStep: function( e: Event, action: string, index: number ) {
+      const self = this;
       e.preventDefault();
       if ( 'finish' === action ) {
         window.location = this.$store.state.adminUrl;
@@ -73,7 +82,17 @@ export const onboardingStep: any = Vue.extend( {
 
       if ( 'customizer' === action ) {
         this.$store.commit( 'setOnboardingFlag', true );
-        window.location = this.$store.state.adminUrl + '/customize.php';
+
+        setTimeout( function() {
+          if ( this.usedOnboarding ) {
+            window.location = self.$store.state.adminUrl + '/customize.php';
+          } else {
+            setTimeout( function() {
+              window.location = self.$store.state.adminUrl + '/customize.php';
+            }, 700 );
+          }
+        }, 700 );
+
         return;
       }
 

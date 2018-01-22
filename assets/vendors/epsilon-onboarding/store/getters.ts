@@ -13,6 +13,14 @@ export const getters = {
     return state.importedDemo;
   },
   /**
+   * Get imported state
+   * @param state
+   * @returns {() => any}
+   */
+  getOnboardingStatus: function( state: any ) {
+    return state.onboardingStatus;
+  },
+  /**
    * Gets the field value based on a "relation"
    * @param state
    */
