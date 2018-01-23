@@ -95,14 +95,25 @@ class Epsilon_Wordpress_Tracking extends Epsilon_Tracking {
 		}
 
 		$plugins   = get_plugins();
-		$active    = get_option( 'active_plugins', array() );
+		$option    = get_option( 'active_plugins', array() );
+		$active    = array();
 		$installed = array();
 		foreach ( $plugins as $id => $info ) {
 			if ( in_array( $id, $active ) ) {
 				continue;
 			}
 
+			$id = explode( '/', $id );
+			$id = ucwords( str_replace( '-', ' ', $id[0] ) );
+
 			$installed[] = $id;
+		}
+
+		foreach ( $option as $id ) {
+			$id = explode( '/', $id );
+			$id = ucwords( str_replace( '-', ' ', $id[0] ) );
+
+			$active[] = $id;
 		}
 
 		return array(
