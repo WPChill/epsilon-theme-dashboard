@@ -80,7 +80,8 @@ class Epsilon_Customer_Tracking {
 			$this->collect_data();
 		}
 
-		if ( empty( array_filter( $this->data['user'] ) ) ) {
+		$user = array_filter( $this->data['user'] );
+		if ( empty( $user ) ) {
 			return false;
 		}
 
