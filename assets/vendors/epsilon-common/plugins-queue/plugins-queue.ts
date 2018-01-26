@@ -20,6 +20,7 @@ export const dashboardPluginsQueue: any = Vue.extend( {
         activateOnly: this.$store.state.translations.activateOnly,
         installAndActivate: this.$store.state.translations.installAndActivate,
         installing: this.$store.state.translations.installing,
+        skipping: this.$store.state.translations.skipping,
         activating: this.$store.state.translations.activating,
         version: this.$store.state.translations.version,
         recommended: this.$store.state.translations.recommended,
@@ -52,7 +53,8 @@ export const dashboardPluginsQueue: any = Vue.extend( {
             </span>
           </template>
           <template v-else-if="pluginsQueued">
-            <span class="epsilon-plugin-box--action-info">{{ translations.installing }}</span>
+            <span v-if="installationQueue[index].install" class="epsilon-plugin-box--action-info">{{ translations.installing }}</span>
+            <span v-else class="epsilon-plugin-box--action-info">{{ translations.skipping }}</span>
           </template>
           <template v-else>
             <div class="checkbox_switch">
@@ -64,9 +66,6 @@ export const dashboardPluginsQueue: any = Vue.extend( {
           </template>
         </div>
       </transition-group>
-      <div class="epsilon-step-actions">
-        <a href="#" @click="handlePlugins($event)" class="button"> {{ translations.installPlugins }} </a>
-      </div>
     </div>
   `,
   methods: {
@@ -80,23 +79,62 @@ export const dashboardPluginsQueue: any = Vue.extend( {
       } );
     },
     /**
-     * Handles plugins
+     * Map changes in queue
      */
-    handlePlugins: function( event: Event ) {
-      event.preventDefault();
+    mapChangesInQueue: function() {
       const self = this;
-      this.pluginsQueued = true;
-      self.plugins.map( function( element: { label: string, slug: string, installed: boolean, active: boolean }, index: number ) {
+      self.pluginsCount = 0;
+      self.installationQueue.map( function( element: { install: boolean }, index: number ) {
         if ( self.installationQueue[ index ].install ) {
           self.pluginsCount += 1;
         }
       } );
 
+      if ( 0 === self.pluginsCount ) {
+        setTimeout(
+            function() {
+              self.$store.commit( 'setStepLoading', false );
+            }, 150
+        );
+      }
+    },
+    /**
+     * Map Plugins
+     */
+    mapPlugins: function() {
+      const self = this;
+      self.plugins.map( function( element: { label: string, slug: string, installed: boolean, active: boolean }, index: number ) {
+        if ( self.installationQueue[ index ].install ) {
+          self.pluginsCount += 1;
+        }
+      } );
+    },
+
+    /**
+     *
+     * @param {} args
+     */
+    handlePlugins: function( args: { action: string, from: number } ) {
+      const self = this;
+
+      this.pluginsQueued = true;
+
+      if ( 0 === this.pluginsCount ) {
+        setTimeout(
+            function() {
+              self.$root.$emit( 'change-step', args );
+            }, 150
+        );
+        return;
+      }
+
+      self.mapChangesInQueue();
+
       self.installerQueue = setInterval( function() {
         self.plugins.map( function( element: { id: string, label: string, slug: string, installed: boolean, active: boolean }, index: number ) {
           if ( self.installationQueue[ index ].install ) {
             element.slug = element.id;
-            self._handlePlugin( index, element );
+            self._handlePlugin( index, element, args );
           }
         } );
       }, 1000 );
@@ -106,14 +144,19 @@ export const dashboardPluginsQueue: any = Vue.extend( {
      *
      * @param index
      * @param element
+     * @param args
      * @private
      */
-    _handlePlugin( index: number, element: any ) {
+    _handlePlugin( index: number, element: any, args: { action: string, from: number } ) {
       const self = this;
       self.removeDupes( 'pluginsInstalled' );
 
       if ( self.pluginsInstalled.length >= self.pluginsCount ) {
         clearInterval( self.installerQueue );
+        if ( ! self.pluginsFinished ) {
+          self.$root.$emit( 'change-step', args );
+        }
+
         self.installerQueue = null;
         self.pluginsFinished = true;
         self.pluginsQueued = false;
@@ -223,7 +266,15 @@ export const dashboardPluginsQueue: any = Vue.extend( {
           self.installationQueue.push( { install: ! json.plugins[ i ].active } );
         }
       }
+
+      self.mapPlugins();
     } );
-  }
+  },
+  /**
+   * Mounted lifecycle
+   */
+  created: function() {
+    this.$root.$on( 'install-plugins', this.handlePlugins );
+  },
 } );
 Vue.component( 'plugins-queue', dashboardPluginsQueue );

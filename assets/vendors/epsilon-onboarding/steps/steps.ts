@@ -22,7 +22,9 @@ export const onboardingStep: any = Vue.extend( {
    * @returns {{}}
    */
   data: function() {
-    return {};
+    return {
+      stepLoading: false,
+    };
   },
   /**
    * Computed data
@@ -47,7 +49,7 @@ export const onboardingStep: any = Vue.extend( {
       </template>
       
       <template v-if="info.id === 'demos'">
-        <demos :path="info.demos" ></demos>
+        <demos-onboarding :path="info.demos" ></demos-onboarding>
       </template>
       
       <template v-if="info.fields">
@@ -56,7 +58,7 @@ export const onboardingStep: any = Vue.extend( {
       
       <div class="epsilon-buttons">
         <template v-for="button in info.buttons">
-          <a href="#" @click="changeStep($event, button.action, index)" class="button button-primary button-hero" v-html="button.label"></a>
+          <a href="#" @click="changeStep($event, button.action, index)" class="button button-primary button-hero" v-bind:class="{ disabled: stepLoading }" v-html="button.label"></a>
         </template>
       </div>
     </div>
@@ -66,21 +68,49 @@ export const onboardingStep: any = Vue.extend( {
    */
   methods: {
     /**
+     * Step loading
+     */
+    stepLoading: function() {
+      this.stepLoading = false;
+    },
+    /**
      * Change the step currently viewed
      *
      * @param {Event} e
      * @param {string} action
      * @param {number} index
+     * @return
      */
-    changeStep: function( e: Event, action: string, index: number ) {
+    changeStep: function( e: JQueryEventConstructor, action: string, index: number ) {
       const self = this;
       e.preventDefault();
+
+      if ( this.stepLoading ) {
+        return;
+      }
+
+      if ( 'next' === action ) {
+        if ( 'plugins' === self.info.id ) {
+          this.stepLoading = true;
+          this.$root.$emit( 'install-plugins', { action: action, from: index } );
+          return;
+        }
+
+        if ( 'demos' === self.info.id ) {
+          this.stepLoading = true;
+          this.$root.$emit( 'install-demo', { action: action, from: index } );
+          return;
+        }
+      }
+
       if ( 'finish' === action ) {
+        this.stepLoading = true;
         window.location = this.$store.state.adminUrl;
         return;
       }
 
       if ( 'customizer' === action ) {
+        this.stepLoading = true;
         this.$store.commit( 'setOnboardingFlag', true );
 
         setTimeout( function() {
@@ -98,7 +128,9 @@ export const onboardingStep: any = Vue.extend( {
 
       this.$root.$emit( 'change-step', { action: action, from: index } );
     },
-
   },
+  created: function() {
+    this.$root.$on( 'changed-step', this.stopLoading );
+  }
 } );
 Vue.component( 'onboarding-step', onboardingStep );

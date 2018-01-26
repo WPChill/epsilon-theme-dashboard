@@ -20,6 +20,12 @@
       }
     }
   }
+
+  .button-primary.disabled {
+    background-color: #d0d0d0 !important;
+    border-color: darken(#d0d0d0, 5%) !important;
+    color: #fff !important;
+  }
 }
 
 .hasProgress {

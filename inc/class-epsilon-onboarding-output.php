@@ -98,7 +98,7 @@ class Epsilon_Onboarding_Output {
 		wp_enqueue_script(
 			'epsilon-onboarding',
 			get_template_directory_uri() . '/inc/libraries/epsilon-theme-dashboard/assets/js/epsilon-onboarding.js',
-			array(),
+			array('jquery'),
 			false,
 			true
 		);

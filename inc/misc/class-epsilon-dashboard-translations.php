@@ -26,6 +26,7 @@ class Epsilon_Dashboard_Translations {
 			'waiting'            => esc_html__( 'Waiting', 'epsilon-framework' ),
 			'installing'         => esc_html__( 'Installing', 'epsilon-framework' ),
 			'activating'         => esc_html__( 'Activating', 'epsilon-framework' ),
+			'skipping'           => esc_html__( 'Skipping', 'epsilon-framework' ),
 			'completePlugin'     => esc_html__( 'Installed and Activated', 'epsilon-framework' ),
 			'pluginsFinished'    => esc_html__( 'Plugins installed', 'epsilon-framework' ),
 			'noActionsLeft'      => esc_html__( 'Hooray! There are no required actions for you right now.', 'epsilon-framework' ),

@@ -26,5 +26,13 @@ export const getters = {
    */
   getFieldRelation: ( state: any ) => ( id: string ) => {
     return state.privacy[ id ];
+  },
+  /**
+   * Returns boolean if a step is loading or not
+   * @param state
+   * @returns {any}
+   */
+  getStepLoading: ( state: any ) => {
+    return state.stepLoading;
   }
 };

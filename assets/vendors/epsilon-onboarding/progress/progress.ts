@@ -71,13 +71,13 @@ export const onboardingProgress: any = Vue.extend( {
 
         if ( 0 === self.currentStep ) {
           self.computedWidth = 0;
-        } else if ( self.currentStep === ( self.progressSteps.length - 1 ) ) {
-          self.computedWidth = self.selfprogressFullWidth;
+        } else if ( self.currentStep === (self.progressSteps.length - 1) ) {
+          self.computedWidth = self.progressFullWidth;
         } else {
-          self.computedWidth = self.progressStepWidth + ( self.currentStep * ( 2 * self.progressStepWidth ) );
+          self.computedWidth = self.progressStepWidth + (self.currentStep * (2 * self.progressStepWidth));
         }
 
-      }, 400 );
+      }, 600 );
 
     },
     /**
@@ -86,12 +86,13 @@ export const onboardingProgress: any = Vue.extend( {
     calculateOneStep: function(): void {
       let self = this, list = this.$el.getElementsByTagName( 'ul' ),
           width;
+
       for ( let i = 0; i < list.length; i ++ ) {
         width = list[ i ].offsetWidth;
-        self.selfprogressFullWidth = width;
       }
+      self.progressFullWidth = width;
 
-      this.progressStepWidth = ( width / self.progressSteps.length ) / 2;
+      this.progressStepWidth = (width / self.progressSteps.length) / 2;
     },
   },
   /**

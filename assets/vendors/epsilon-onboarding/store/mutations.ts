@@ -8,6 +8,15 @@ declare let ajaxurl: any;
  */
 export const mutations = {
   /**
+   * Boolean
+   *
+   * @param state
+   * @param {boolean} bool
+   */
+  setStepLoading( state: any, bool: boolean ) {
+    state.stepLoading = bool;
+  },
+  /**
    * Sets an installation flag for a plugin
    * @param state
    * @param slug
