@@ -87,6 +87,17 @@
         background: #0072bc;
       }
     }
+
+    &.imported {
+      .epsilon-demo-box {
+        border-color: #888;
+        opacity: .4;
+        pointer-events: none;
+        .epsilon-demo-title {
+          background: #888;
+        }
+      }
+    }
   }
 }
 

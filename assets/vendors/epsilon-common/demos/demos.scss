@@ -1,5 +1,5 @@
 #epsilon-demo.epsilon-dashboard-tab .row,
-#epsilon-demos .row{
+#epsilon-demos .row {
   position: relative;
   display: inline-block;
   width: 100%;
@@ -10,7 +10,7 @@
     display: inline-block;
     &.col {
       display: inline-block;
-      min-width: initial;
+      min-width: 159px;
       width: 155px;
       margin-right: 20px;
     }
@@ -80,13 +80,25 @@
         background: transparent;
       }
     }
+  }
 
-    &.epsilonDemoSelected {
-      .epsilon-demo-box {
-        border: 2px solid #0072bc;
-        .epsilon-demo-title {
-          background: #0072bc;
-        }
+  &.epsilonDemoSelected {
+    img {
+      border: 2px solid #0072bc;
+    }
+
+    .epsilon-demo-title {
+      background: #0072bc;
+    }
+
+    &.imported {
+      img {
+        border-color: #888;
+        opacity: .4;
+      }
+
+      .epsilon-demo-title {
+        background: #888;
       }
     }
   }

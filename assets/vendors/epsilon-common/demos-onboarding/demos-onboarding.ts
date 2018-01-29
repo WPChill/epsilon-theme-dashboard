@@ -238,7 +238,7 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
    * Template
    */
   template: `
-    <transition-group tag="div" name="demo-complete" class="row" :class="{ epsilonDemoSelected: null !== currentDemo }">
+    <transition-group tag="div" name="demo-complete" class="row" :class="{ epsilonDemoSelected: null !== currentDemo, imported: importedDemo }">
       <div class="col epsilon-demo-box demo-complete-item" v-for="(demo, index) in availableDemos" :key="demo.id" v-if="null === currentDemo || index === currentDemo">
         <img :src="demo.thumb" />
         <template v-if="index == currentDemo">
