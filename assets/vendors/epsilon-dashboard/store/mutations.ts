@@ -115,6 +115,7 @@ export const mutations = {
       fetch( ajaxurl, fetchObj ).then( function( res ) {
         return res.json();
       } ).then( function( json ) {
+        console.log( json );
         if ( json.status && 'ok' === json.message ) {
           state.importedDemo = true;
         }

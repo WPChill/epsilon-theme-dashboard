@@ -81,7 +81,7 @@ export const dashboardPluginsQueue: any = Vue.extend( {
     /**
      * Map changes in queue
      */
-    mapChangesInQueue: function() {
+    mapChangesInQueue: function( args: { action: string, from: number } ) {
       const self = this;
       self.pluginsCount = 0;
       self.installationQueue.map( function( element: { install: boolean }, index: number ) {
@@ -93,7 +93,7 @@ export const dashboardPluginsQueue: any = Vue.extend( {
       if ( 0 === self.pluginsCount ) {
         setTimeout(
             function() {
-              self.$store.commit( 'setStepLoading', false );
+              self.$root.$emit( 'change-step', args );
             }, 150
         );
       }
@@ -128,7 +128,7 @@ export const dashboardPluginsQueue: any = Vue.extend( {
         return;
       }
 
-      self.mapChangesInQueue();
+      self.mapChangesInQueue( args );
 
       self.installerQueue = setInterval( function() {
         self.plugins.map( function( element: { id: string, label: string, slug: string, installed: boolean, active: boolean }, index: number ) {

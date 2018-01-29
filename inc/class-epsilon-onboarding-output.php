@@ -143,10 +143,6 @@ class Epsilon_Onboarding_Output {
 				 * Plugins that should be installed
 				 */
 				'plugins'      => $this->plugins,
-				/**
-				 * Imported Demo flag
-				 */
-				'importedDemo' => get_theme_mod( $this->theme['theme-slug'] . '_content_imported', false ),
 			)
 		);
 	}

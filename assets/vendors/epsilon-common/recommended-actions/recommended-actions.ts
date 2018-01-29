@@ -72,7 +72,6 @@ export const dashboardRecommendedActions: any = Vue.extend( {
      * @param {number} index
      */
     removeAction: function( index: number ) {
-      console.log( index );
       this.$store.commit( 'removeAction', index );
     },
     /**
