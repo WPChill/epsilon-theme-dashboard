@@ -118,7 +118,7 @@ class Epsilon_Request {
 			'httpversion' => '1.1',
 			'blocking'    => true,
 			'body'        => $this->data,
-			'user-agent'  => 'MT/EPSILON-CUSTOMER-TRACKING/' . get_bloginfo( 'url' )
+			'user-agent'  => 'MT/EPSILON-CUSTOMER-TRACKING/' . esc_url( home_url() )
 		) );
 
 		if ( is_wp_error( $request ) ) {

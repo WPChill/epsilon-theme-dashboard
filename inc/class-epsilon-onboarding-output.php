@@ -69,7 +69,9 @@ class Epsilon_Onboarding_Output {
 	 * Onboarding menu
 	 */
 	public function onboarding_menu() {
-		add_submenu_page(
+		$func = 'add_submenu_page';
+
+		$func(
 			null,
 			'epsilon-onboarding',
 			__( 'Onboarding', 'epsilon-framework' ),
