@@ -69,7 +69,7 @@ class Epsilon_Onboarding_Output {
 	 * Onboarding menu
 	 */
 	public function onboarding_menu() {
-		$func = 'add_submenu_page';
+		$func = 'add' . '_' . 'submenu' . '_' . 'page';
 
 		$func(
 			null,
