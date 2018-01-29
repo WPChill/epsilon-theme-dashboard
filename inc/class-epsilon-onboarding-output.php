@@ -98,7 +98,7 @@ class Epsilon_Onboarding_Output {
 		wp_enqueue_script(
 			'epsilon-onboarding',
 			get_template_directory_uri() . '/inc/libraries/epsilon-theme-dashboard/assets/js/epsilon-onboarding.js',
-			array('jquery'),
+			array( 'jquery' ),
 			false,
 			true
 		);
@@ -143,6 +143,10 @@ class Epsilon_Onboarding_Output {
 				 * Plugins that should be installed
 				 */
 				'plugins'      => $this->plugins,
+				/**
+				 * Imported Demo flag
+				 */
+				'importedDemo' => get_theme_mod( $this->theme['theme-slug'] . '_content_imported', false ),
 			)
 		);
 	}

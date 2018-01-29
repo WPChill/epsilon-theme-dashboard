@@ -149,6 +149,10 @@ class Epsilon_Dashboard_Output {
 				 * Setting up a default tab
 				 */
 				'activeTab'    => 0,
+				/**
+				 * Imported Demo flag
+				 */
+				'importedDemo' => get_theme_mod( $this->theme['theme-slug'] . '_content_imported', false ),
 			)
 		);
 	}
