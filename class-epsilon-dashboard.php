@@ -221,7 +221,14 @@ class Epsilon_Dashboard {
 	 * Start onboarding process
 	 */
 	public function init_onboarding() {
+		$used_onboarding = get_theme_mod( get_stylesheet() . '_used_onboarding', false );
 		if ( ! empty( $_GET ) && isset( $_GET['page'] ) && 'epsilon-onboarding' === $_GET['page'] ) {
+
+			if ( $used_onboarding ) {
+				wp_redirect( esc_url( admin_url() . '/themes.php?page=' . $this->theme['theme-slug'] . '-dashboard' ) );
+				exit();
+			}
+
 			new Epsilon_Onboarding_Output(
 				array(
 					'theme'   => $this->theme,

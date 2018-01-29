@@ -455,12 +455,17 @@ export const dashboardDemos: any = Vue.extend( {
             </ul>
         </template>
         <span class="epsilon-demo-title">{{ demo.label }}</span>
-        <template v-if="index == currentDemo">
-            <button class="button button-primary" @click="importDemo(index)" :disabled="importedDemo">{{ translations.import }}</button>
-            <button class="button button-link" @click="selectDemo(index)">{{ translations.cancel }}</button>
+        <template v-if="availableDemos > 1">
+          <template v-if="index == currentDemo">
+              <button class="button button-primary" @click="importDemo(index)" :disabled="importedDemo">{{ translations.import }}</button>
+              <button class="button button-link" @click="selectDemo(index)">{{ translations.cancel }}</button>
+          </template>
+          <template v-else>
+              <button class="button button-primary" @click="selectDemo(index)">{{ translations.select }}</button>
+          </template>
         </template>
         <template v-else>
-            <button class="button button-primary" @click="selectDemo(index)">{{ translations.select }}</button>
+          <button class="button button-primary" @click="importDemo(index)" :disabled="importedDemo">{{ translations.import }}</button>
         </template>
       </div>
     </transition-group>

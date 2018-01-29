@@ -1,5 +1,5 @@
 #epsilon-demo.epsilon-dashboard-tab .row,
-#epsilon-demos .row{
+#epsilon-demos .row {
   position: relative;
   display: inline-block;
   width: 100%;
@@ -33,7 +33,6 @@
       width: 100%;
       padding: 5px;
       box-sizing: border-box;
-      margin-bottom: 10px;
     }
     ul {
       position: absolute;
@@ -78,6 +77,14 @@
       position: absolute;
       &:hover, &:focus {
         background: transparent;
+      }
+    }
+  }
+  &.epsilonDemoSelected {
+    .epsilon-demo-box {
+      border: 1px solid #0072bc;
+      .epsilon-demo-title {
+        background: #0072bc;
       }
     }
   }
