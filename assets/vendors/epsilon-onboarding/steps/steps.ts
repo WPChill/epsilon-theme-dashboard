@@ -23,7 +23,7 @@ export const onboardingStep: any = Vue.extend( {
    */
   data: function() {
     return {
-      stepLoading: false,
+      stepLoading: false
     };
   },
   /**
@@ -70,7 +70,7 @@ export const onboardingStep: any = Vue.extend( {
     /**
      * Step loading
      */
-    stepLoading: function() {
+    stopLoading: function() {
       this.stepLoading = false;
     },
     /**

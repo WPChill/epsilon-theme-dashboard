@@ -227,7 +227,7 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
       fetch( ajaxurl, fetchObj ).then( function( res ) {
         return res.json();
       } ).then( function( json ) {
-        if ( json.status && ( '1' === json.value || true === json.value || 'true' === json.value ) ) {
+        if ( json.status && ('1' === json.value || true === json.value || 'true' === json.value) ) {
           self.$store.commit( 'setImportedFlag', false );
         }
       } );
@@ -285,7 +285,6 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
   beforeMount: function() {
     const self = this;
     let temp: any, t1: any;
-
     this.checkAlreadyInstalled();
 
     let fetchObj: EpsilonFetchTranslator,
