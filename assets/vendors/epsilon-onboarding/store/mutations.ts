@@ -102,5 +102,37 @@ export const mutations = {
         }
       } );
     }
+  },
+  /**
+   * Sets tracking status to true
+   * @param state
+   */
+  setTrackingStatus( state: any ) {
+    let temp: any = {};
+    temp[ state.theme[ 'theme-slug' ] + '_tracking_enable' ] = true;
+    state.importedDemo = true;
+
+    let fetchObj: EpsilonFetchTranslator,
+        data = {
+          action: 'epsilon_dashboard_ajax_callback',
+          nonce: state.ajax_nonce,
+          args: {
+            action: [ 'Epsilon_Dashboard_Helper', 'set_options' ],
+            nonce: state.ajax_nonce,
+            args: {
+              option: temp
+            },
+          },
+        };
+
+    fetchObj = new EpsilonFetchTranslator( data );
+
+    fetch( ajaxurl, fetchObj ).then( function( res ) {
+      return res.json();
+    } ).then( function( json ) {
+      if ( json.status && 'ok' === json.message ) {
+        return;
+      }
+    } );
   }
 };

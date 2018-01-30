@@ -26,6 +26,40 @@
     border-color: darken(#d0d0d0, 5%) !important;
     color: #fff !important;
   }
+
+  .permission-request {
+    a {
+      text-decoration: none;
+      &:hover,
+      &:focus {
+        text-decoration: none;
+      }
+    }
+
+    > div {
+      display: none;
+
+      ul {
+        li {
+          margin-bottom: 10px;
+          .dashicons {
+            font-size: 30px;
+            width: 30px;
+            height: 30px;
+            line-height: 39px;
+            display: inline-block;
+          }
+          .content {
+            display: inline-block;
+            margin-left: 10px;
+            strong, small {
+              display: block;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 .hasProgress {

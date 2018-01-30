@@ -41,7 +41,7 @@ class Epsilon_Customer_Tracking {
 		/**
 		 * Epsilon customer tracking
 		 */
-		'epsilon-customer-tracking' => true,
+		'epsilon-customer-tracking' => false,
 		/**
 		 * Server data
 		 */
@@ -110,7 +110,7 @@ class Epsilon_Customer_Tracking {
 	 * Let's see if we're allowed to track user data
 	 */
 	public function allowed_tracking() {
-		$allowed = get_option( $this->tracking_option, true );
+		$allowed = get_option( $this->tracking_option, false );
 
 		if ( in_array( $allowed, array( true, 1, '1' ) ) ) {
 			$this->allowed = true;
