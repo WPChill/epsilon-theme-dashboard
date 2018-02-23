@@ -45,6 +45,10 @@ export const dashboardDemos: any = Vue.extend( {
       demoImporter: [],
       importing: false,
       /**
+       * Tmp var
+       */
+      tmp: null,
+      /**
        * Plugin related models
        */
       installerQueue: null,
@@ -68,45 +72,60 @@ export const dashboardDemos: any = Vue.extend( {
      * @param {string} id
      */
     importDemo: function( id: string ) {
-      const self = this;
-      let time: number = 0,
-          i: number = 0;
       if ( this.importedDemo ) {
         return;
       }
-
-      for ( let key in this.demoImporter[ id ] ) {
-        if ( ! this.demoImporter[ id ][ key ].status ) {
-          continue;
-        }
-
-        this.importing = true;
-        this.pluginsQueued = true;
-        this.demoImporter[ id ][ key ].imported = 'importing';
-
-        time += 450;
-        setTimeout( function() {
-          i ++;
-          if ( 'plugins' === key ) {
-            self.installPlugins( id, key );
-            return;
-          }
-
-          self.runAjaxInLoop( id, key );
-
-          if ( i === self.availableDemos[ id ].content.length && null === self.installerQueue ) {
-            self.$store.commit( 'setImportedFlag', true );
-          }
-        }, time );
-      }
+      this.handleImporting();
     },
 
     /**
-     * Runs ajax in the loop
+     *
+     */
+    handleImporting: function() {
+      this.importing = true;
+
+      for ( let key in this.demoImporter[ this.currentDemo ] ) {
+        this.demoImporter[ this.currentDemo ][ key ].imported = 'importing';
+        this.pluginsQueued = true;
+      }
+
+      this.startImporting( 0 );
+    },
+
+    /**
+     *
+     * @param now
+     */
+    startImporting: function( now: number ) {
+      let keys = Object.keys( this.demoImporter[ this.currentDemo ] ),
+          next = now + 1;
+
+      if ( ! this.demoImporter[ this.currentDemo ][ keys[ now ] ].status ) {
+        this.startImporting( next );
+      }
+
+      if ( 'plugins' === this.demoImporter[ this.currentDemo ][ keys[ now ] ].key ) {
+        this.tmp = next;
+        this.installPlugins( this.currentDemo, keys[ now ] );
+        return;
+      }
+
+      if ( typeof keys[ next ] === 'undefined' ) {
+        this.runAjaxInLoop( this.currentDemo, keys[ now ], now, true );
+        return;
+      }
+
+      this.runAjaxInLoop( this.currentDemo, keys[ now ], now, false );
+    },
+
+    /**
+     *
      * @param {number} demoIndex
      * @param {string} contentId
+     * @param {number} index
+     * @param {boolean} last
      */
-    runAjaxInLoop: function( demoIndex: number, contentId: string ) {
+    runAjaxInLoop: function( demoIndex: number, contentId: string, index: number, last: boolean ) {
       const self = this;
       let fetchObj: EpsilonFetchTranslator,
           temp: any = {},
@@ -136,7 +155,11 @@ export const dashboardDemos: any = Vue.extend( {
       fetch( ajaxurl, fetchObj ).then( function( res ) {
         return res.json();
       } ).then( function( json ) {
-        self.handleResult( json, demoIndex, contentId );
+        self.handleResult( json, demoIndex, contentId, last );
+
+        if ( ! last ) {
+          setTimeout( self.startImporting( index + 1 ), 500 );
+        }
       } );
     },
 
@@ -186,7 +209,7 @@ export const dashboardDemos: any = Vue.extend( {
         clearInterval( self.installerQueue );
         self.installerQueue = null;
         self.pluginsFinished = true;
-        self.$store.commit( 'setImportedFlag', true );
+        self.startImporting( self.tmp );
         return;
       }
 
@@ -295,14 +318,19 @@ export const dashboardDemos: any = Vue.extend( {
      * @param {} result
      * @param {number} demoIndex
      * @param {string} contentId
+     * @param {boolean} last
      */
-    handleResult: function( result: { status: boolean, message: string }, demoIndex: number, contentId: string ) {
+    handleResult: function( result: { status: boolean, message: string }, demoIndex: number, contentId: string, last: boolean ) {
       if ( result.status && 'ok' === result.message ) {
         this.demoImporter[ demoIndex ][ contentId ].imported = 'imported';
       }
 
       if ( ! result.status ) {
         this.demoImporter[ demoIndex ][ contentId ].imported = 'failed';
+      }
+
+      if ( last ) {
+        this.$store.commit( 'setImportedFlag', true );
       }
     },
 
@@ -502,7 +530,7 @@ export const dashboardDemos: any = Vue.extend( {
           self.availableDemos.push( json.demos[ key ] );
           temp = {};
           json.demos[ key ].content.map( function( element: any ) {
-            temp[ element.id ] = { status: true, imported: false };
+            temp[ element.id ] = { key: element.id, status: true, imported: false };
           } );
 
           self.demoImporter.push( temp );

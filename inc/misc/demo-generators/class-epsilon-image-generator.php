@@ -50,7 +50,7 @@ class Epsilon_Image_Generator {
 
 		$this->post_id = $post_id;
 		$this->size    = $size;
-		$this->desc    = $desc . ' - Automatically downloaded from flickr.com.';
+		$this->desc    = $desc . ' - Automatically downloaded from unsplash.com.';
 
 		$this->options = $options;
 
