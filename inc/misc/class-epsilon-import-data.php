@@ -2,7 +2,7 @@
 /**
  * Epsilon Import Data Class
  *
- * @package MedZone
+ * @package Epsilon Framework
  * @since   1.0
  */
 
@@ -179,6 +179,7 @@ class Epsilon_Import_Data {
 			'id'      => 'standard',
 			'content' => array(
 				'menus'    => true,
+				'posts'    => true,
 				'options'  => true,
 				'widgets'  => true,
 				'content'  => true,
@@ -220,6 +221,28 @@ class Epsilon_Import_Data {
 		}
 
 		return $status;
+	}
+
+	/**
+	 * Import sections
+	 */
+	public function import_posts( $id = '', $type = '' ) {
+		if ( empty( $this->demos[ $id ] ) || empty( $this->demos[ $id ][ $type ] ) ) {
+			return 'nok';
+		}
+
+		$class  = $this->demos[ $id ][ $type ]['content']['importer']['class'];
+		$method = $this->demos[ $id ][ $type ]['content']['importer']['method'];
+		$args   = array(
+			'post_count'     => $this->demos[ $id ][ $type ]['content']['post_count'],
+			'image_size'     => $this->demos[ $id ][ $type ]['content']['image_size'],
+			'image_category' => $this->demos[ $id ][ $type ]['content']['image_category'],
+		);
+
+		$importer = new $class( $args );
+		$importer->$method();
+
+		return 'ok';
 	}
 
 	/**

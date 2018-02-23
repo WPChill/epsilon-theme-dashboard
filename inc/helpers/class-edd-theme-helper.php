@@ -1,8 +1,8 @@
 <?php
 /**
- * MedZone EDD Related Theme Helpers
+ * Epsilon Framework EDD Related Theme Helpers
  *
- * @package MedZone
+ * @package Epsilon Framework
  * @since   1.0
  */
 

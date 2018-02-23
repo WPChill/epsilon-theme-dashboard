@@ -40,6 +40,7 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
       currentDemo: null,
       demoImporter: [],
       importing: false,
+      tmp: null,
     };
   },
   computed: {
@@ -53,50 +54,51 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
      */
     importDemo: function( args: { action: string, from: number } ) {
       const self = this;
+      this.tmp = args;
+      this.handleImporting();
+    },
 
-      let id = this.currentDemo;
-      let time: number = 0,
-          i: number = 0;
+    /**
+     *
+     */
+    handleImporting: function() {
+      this.importing = true;
 
-      if ( this.importedDemo ) {
-        setTimeout(
-            function() {
-              self.$root.$emit( 'change-step', args );
-            }, 150
-        );
+      for ( let key in this.demoImporter[ this.currentDemo ] ) {
+        this.demoImporter[ this.currentDemo ][ key ].imported = 'importing';
+      }
+
+      this.startImporting( 0 );
+    },
+
+    /**
+     *
+     * @param now
+     */
+    startImporting: function( now: number ) {
+      let keys = Object.keys( this.demoImporter[ this.currentDemo ] ),
+          next = now + 1;
+
+      if ( ! this.demoImporter[ this.currentDemo ][ keys[ now ] ].status ) {
+        this.startImporting( next );
+      }
+
+      if ( typeof keys[ next ] === 'undefined' ) {
+        this.runAjaxInLoop( this.currentDemo, keys[ now ], now, true );
         return;
       }
 
-      for ( let key in this.demoImporter[ id ] ) {
-        if ( ! this.demoImporter[ id ][ key ].status ) {
-          continue;
-        }
-
-        this.importing = true;
-        this.demoImporter[ id ][ key ].imported = 'importing';
-
-        time += 450;
-        setTimeout( function() {
-          i ++;
-          self.runAjaxInLoop( id, key );
-
-          if ( i === self.availableDemos[ id ].content.length ) {
-            self.$store.commit( 'setImportedFlag', true );
-
-            setTimeout( function() {
-              self.$root.$emit( 'change-step', args );
-            }, 450 );
-          }
-        }, time );
-      }
+      this.runAjaxInLoop( this.currentDemo, keys[ now ], now, false );
     },
 
     /**
      * Runs ajax in the loop
      * @param {number} demoIndex
      * @param {string} contentId
+     * @param {number} index
+     * @param {boolean} last
      */
-    runAjaxInLoop: function( demoIndex: number, contentId: string ) {
+    runAjaxInLoop: function( demoIndex: number, contentId: string, index: number, last: boolean ) {
       const self = this;
       let fetchObj: EpsilonFetchTranslator,
           temp: any = {},
@@ -105,6 +107,8 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
             nonce: string,
             args: {},
           };
+
+      this.demoImporter[ demoIndex ][ contentId ].imported = 'importing';
 
       temp[ contentId ] = self.demoImporter[ demoIndex ][ contentId ];
       data = {
@@ -126,7 +130,11 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
       fetch( ajaxurl, fetchObj ).then( function( res ) {
         return res.json();
       } ).then( function( json ) {
-        self.handleResult( json, demoIndex, contentId );
+        self.handleResult( json, demoIndex, contentId, last );
+
+        if ( ! last ) {
+          setTimeout( self.startImporting( index + 1 ), 500 );
+        }
       } );
     },
 
@@ -135,8 +143,9 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
      * @param {} result
      * @param {number} demoIndex
      * @param {string} contentId
+     * @param {boolean} last item?
      */
-    handleResult: function( result: { status: boolean, message: string }, demoIndex: number, contentId: string ) {
+    handleResult: function( result: { status: boolean, message: string }, demoIndex: number, contentId: string, last: boolean ) {
       if ( result.status && 'ok' === result.message ) {
         this.demoImporter[ demoIndex ][ contentId ].imported = 'imported';
       }
@@ -144,6 +153,12 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
       if ( ! result.status ) {
         this.demoImporter[ demoIndex ][ contentId ].imported = 'failed';
       }
+
+      if ( last ) {
+        this.$store.commit( 'setImportedFlag', true );
+        this.$root.$emit( 'change-step', this.tmp );
+      }
+
     },
 
     /**
@@ -310,7 +325,7 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
           self.availableDemos.push( json.demos[ key ] );
           temp = {};
           json.demos[ key ].content.map( function( element: any ) {
-            temp[ element.id ] = { status: true, imported: false };
+            temp[ element.id ] = { key: element.id, status: true, imported: false };
           } );
 
           self.demoImporter.push( temp );
@@ -329,6 +344,7 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
    */
   created: function() {
     this.$root.$on( 'changed-epsilon-toggle', this.changeDemoContent );
+    this.$root.$on( 'go-to-next-step', this.handleImporting );
     this.$root.$on( 'install-demo', this.importDemo );
   },
 } );
