@@ -100,10 +100,12 @@ class Epsilon_Import_Data {
 	 */
 	private function _parse_json_js( $json ) {
 		$arr = array();
+
 		foreach ( $json as $k => $v ) {
 			$arr[ $k ]['id']      = $k;
 			$arr[ $k ]['label']   = $v['label'];
 			$arr[ $k ]['thumb']   = get_template_directory_uri() . $v['thumb'];
+			$arr[ $k ]['tags']    = isset( $v['tag'] ) ? $v['tag'] : array();
 			$arr[ $k ]['content'] = array();
 
 			foreach ( $v as $key => $value ) {
@@ -111,6 +113,9 @@ class Epsilon_Import_Data {
 					continue;
 				}
 				if ( 'label' === $key ) {
+					continue;
+				}
+				if ( 'tag' === $key ) {
 					continue;
 				}
 
@@ -339,6 +344,16 @@ class Epsilon_Import_Data {
 						'menu-item-url'     => home_url( '/' ),
 						'menu-item-status'  => 'publish',
 					) );
+
+					$page_for_posts = get_option( 'page_for_posts', false );
+					if ( $page_for_posts ) {
+						wp_update_nav_menu_item( $menu_id, 0, array(
+							'menu-item-title'   => esc_html__( 'Blog', 'epsilon-framework' ),
+							'menu-item-classes' => 'blog',
+							'menu-item-url'     => home_url( '/?page_id=' . get_option( 'page_for_posts' ) ),
+							'menu-item-status'  => 'publish',
+						) );
+					}
 				}
 				$arr = $menu['menu'];
 				foreach ( $arr as $item ) {
@@ -473,6 +488,11 @@ class Epsilon_Import_Data {
 				continue;
 			}
 
+			if ( 'blogpage' === $k ) {
+				$this->check_blog_page();
+				continue;
+			}
+
 			$import[ $this->demos[ $id ][ $type ]['content'][ $k ]['setting'] ] = $this->demos[ $id ][ $type ]['content'][ $k ]['content'];
 
 		}
@@ -501,6 +521,27 @@ class Epsilon_Import_Data {
 			update_option( 'page_on_front', $id );
 		}
 		$this->front_page = get_option( 'page_on_front' );
+
+		return 'ok';
+	}
+
+	/**
+	 * Check if we have a blog page, if not add it
+	 */
+	public function check_blog_page() {
+		$front = get_option( 'show_on_front' );
+		if ( 'posts' === $front ) {
+			return 'ok';
+		}
+
+		$id = wp_insert_post(
+			array(
+				'post_title'  => __( 'Blog', 'epsilon-framework' ),
+				'post_type'   => 'page',
+				'post_status' => 'publish',
+			)
+		);
+		update_option( 'page_for_posts', $id );
 
 		return 'ok';
 	}

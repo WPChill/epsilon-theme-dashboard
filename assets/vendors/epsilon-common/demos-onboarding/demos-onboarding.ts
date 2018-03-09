@@ -2,7 +2,7 @@ import './demos-onboarding.scss';
 import Vue from 'vue';
 import { EpsilonFetchTranslator } from '../../epsilon-fetch-translator';
 
-declare let wp: any, ajaxurl: string, jQuery: any;
+declare let wp: any, _: any, ajaxurl: string, jQuery: any;
 
 export const dashboardDemosOnboarding: any = Vue.extend( {
   /**
@@ -41,6 +41,8 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
       demoImporter: [],
       importing: false,
       tmp: null,
+      tags: [],
+      selectedTag: null,
     };
   },
   computed: {
@@ -49,6 +51,24 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
     }
   },
   methods: {
+    /**
+     * Filter currently selected demos
+     */
+    filterDemos: function( key: string ) {
+      this.selectedTag = key;
+    },
+    /**
+     * Filtering
+     * @param {Array<String>} tags
+     * @returns {boolean}
+     */
+    checkTag( tags: Array<String> ) {
+      if ( this.selectedTag === null ) {
+        return true;
+      }
+
+      return _.contains( tags, this.selectedTag );
+    },
     /**
      * Import the selected demo
      */
@@ -253,46 +273,52 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
    * Template
    */
   template: `
-    <transition-group tag="div" name="demo-complete" class="row" :class="{ epsilonDemoSelected: null !== currentDemo, imported: importedDemo }">
-      <div class="col epsilon-demo-box demo-complete-item" v-for="(demo, index) in availableDemos" :key="demo.id" v-if="null === currentDemo || index === currentDemo">
-        <img :src="demo.thumb" />
-        <template v-if="index == currentDemo">
-            <template v-if="importedDemo">
-                <p>{{ translations.contentImported }}</p>
+    <div>
+        <nav class="demos-filtering" v-if="tags.length > 1">
+            <button class="button button-primary" @click="filterDemos(null)">All</button>
+            <button class="button button-primary" v-for="tag in tags" @click="filterDemos(tag)">{{ tag }}</button> 
+        </nav>
+        <transition-group tag="div" name="demo-complete" class="row" :class="{ epsilonDemoSelected: null !== currentDemo, imported: importedDemo }">
+        <div class="col epsilon-demo-box demo-complete-item" v-for="(demo, index) in availableDemos" :key="demo.id" v-if="checkTag(demo.tags) && ( null === currentDemo || index === currentDemo )">
+          <img :src="demo.thumb" />
+          <template v-if="index == currentDemo">
+              <template v-if="importedDemo">
+                  <p>{{ translations.contentImported }}</p>
+              </template>
+              <template v-else>
+                <p v-if="importing">{{ translations.waitImport }}</p>
+                <p v-else>{{ translations.selectImport }}</p>
+              </template>
+              
+              <ul class="epsilon-demo-box--advanced-list" v-if="index == currentDemo">
+                <li v-for="content in demo.content" :key="content.id">
+                  <template v-if="wasImported(index, content.id) == 'importing'">
+                    <span class="dashicons dashicons-update"></span> {{ content.label }}
+                  </template>
+                  <template v-else-if="wasImported(index, content.id) == 'imported'">
+                    <span class="dashicons dashicons-yes"></span> {{ content.label }}
+                  </template>
+                  <template v-else-if="wasImported(index, content.id) == 'failed'">
+                    <span class="dashicons dashicons-warning"></span> {{ content.label }}
+                  </template>
+                  <template v-else>
+                    <epsilon-toggle :parent-index="index" :comp-label="content.label" :comp-id="content.id"></epsilon-toggle>
+                  </template>
+                </li>
+              </ul>
+          </template>
+          <span class="epsilon-demo-title">{{ demo.label }}</span>
+          <template v-if="availableDemos.length > 1">
+            <template v-if="index == currentDemo">
+                <button class="button button-link" @click="selectDemo(index)">{{ translations.cancel }}</button>
             </template>
             <template v-else>
-              <p v-if="importing">{{ translations.waitImport }}</p>
-              <p v-else>{{ translations.selectImport }}</p>
+                <button class="button button-primary" @click="selectDemo(index)">{{ translations.select }}</button>
             </template>
-            
-            <ul class="epsilon-demo-box--advanced-list" v-if="index == currentDemo">
-              <li v-for="content in demo.content" :key="content.id">
-                <template v-if="wasImported(index, content.id) == 'importing'">
-                  <span class="dashicons dashicons-update"></span> {{ content.label }}
-                </template>
-                <template v-else-if="wasImported(index, content.id) == 'imported'">
-                  <span class="dashicons dashicons-yes"></span> {{ content.label }}
-                </template>
-                <template v-else-if="wasImported(index, content.id) == 'failed'">
-                  <span class="dashicons dashicons-warning"></span> {{ content.label }}
-                </template>
-                <template v-else>
-                  <epsilon-toggle :parent-index="index" :comp-label="content.label" :comp-id="content.id"></epsilon-toggle>
-                </template>
-              </li>
-            </ul>
-        </template>
-        <span class="epsilon-demo-title">{{ demo.label }}</span>
-        <template v-if="availableDemos.length > 1">
-          <template v-if="index == currentDemo">
-              <button class="button button-link" @click="selectDemo(index)">{{ translations.cancel }}</button>
           </template>
-          <template v-else>
-              <button class="button button-primary" @click="selectDemo(index)">{{ translations.select }}</button>
-          </template>
-        </template>
-      </div>
-    </transition-group>
+        </div>
+      </transition-group>
+    </div>
   `,
   /**
    * Before mount hook
@@ -324,6 +350,14 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
         for ( let key in json.demos ) {
           self.availableDemos.push( json.demos[ key ] );
           temp = {};
+
+          json.demos[ key ].tags.map( ( element: any ) => {
+            if ( ! _.contains( self.tags, element ) ) {
+              self.tags.push( element );
+            }
+
+          } );
+
           json.demos[ key ].content.map( function( element: any ) {
             temp[ element.id ] = { key: element.id, status: true, imported: false };
           } );

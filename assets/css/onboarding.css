@@ -382,6 +382,11 @@
           -webkit-transition: all .3s;
           /* Safari 3.1 to 6.0 */
           transition: all .3s; }
+#epsilon-demos .demos-filtering {
+  margin-bottom: 20px; }
+  #epsilon-demos .demos-filtering button {
+    margin-right: 5px; }
+
 #epsilon-demo.epsilon-dashboard-tab .row,
 #epsilon-demos .row {
   position: relative;
@@ -397,18 +402,26 @@
     #epsilon-demos .row .epsilon-demo-box.col {
       display: inline-block;
       min-width: initial;
-      width: 155px;
+      width: 200px;
       margin-right: 20px; }
+    #epsilon-demo.epsilon-dashboard-tab .row .epsilon-demo-box .button,
+    #epsilon-demos .row .epsilon-demo-box .button {
+      margin: 10px 0; }
+      #epsilon-demo.epsilon-dashboard-tab .row .epsilon-demo-box .button:focus,
+      #epsilon-demos .row .epsilon-demo-box .button:focus {
+        outline: none;
+        box-shadow: none; }
     #epsilon-demo.epsilon-dashboard-tab .row .epsilon-demo-box p,
     #epsilon-demos .row .epsilon-demo-box p {
       position: absolute;
       top: 0;
-      left: 185px;
+      left: 230px;
       width: 325px;
       text-align: left;
       margin-top: 0; }
     #epsilon-demo.epsilon-dashboard-tab .row .epsilon-demo-box img,
     #epsilon-demos .row .epsilon-demo-box img {
+      width: 100%;
       display: block; }
     #epsilon-demo.epsilon-dashboard-tab .row .epsilon-demo-box .epsilon-demo-title,
     #epsilon-demos .row .epsilon-demo-box .epsilon-demo-title {

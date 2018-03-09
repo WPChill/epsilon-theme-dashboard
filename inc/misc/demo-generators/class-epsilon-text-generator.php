@@ -390,7 +390,7 @@ class Epsilon_Text_Generator {
 	public function paragraphs( $count = 1, $tags = false, $array = false ) {
 		$paragraphs = array();
 		for ( $i = 0; $i < $count; $i ++ ) {
-			$paragraphs[] = $this->sentences( $this->gauss( 1.8, 0.93 ) );
+			$paragraphs[] = $this->sentences( $this->gauss( 1, 0.23 ) );
 		}
 
 		return $this->output( $paragraphs, $tags, $array, "\n\n" );
