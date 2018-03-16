@@ -124,7 +124,9 @@ export const dashboardDemos: any = Vue.extend( {
           next = now + 1;
 
       if ( ! this.demoImporter[ this.currentDemo ][ keys[ now ] ].status ) {
+        this.demoImporter[ this.currentDemo ][ keys[ now ] ].imported = 'skipped';
         this.startImporting( next );
+        return;
       }
 
       if ( 'plugins' === this.demoImporter[ this.currentDemo ][ keys[ now ] ].key ) {
@@ -503,6 +505,9 @@ export const dashboardDemos: any = Vue.extend( {
                     <template v-else-if="wasImported(index, content.id) == 'failed'">
                       <span class="dashicons dashicons-warning"></span> {{ content.label }}
                     </template>
+                    <template v-else-if="wasImported(index, content.id) == 'skipped'">
+                      <span class="dashicons dashicons-sort"></span> {{ content.label }}
+                    </template>
                     <template v-else>
                       <epsilon-toggle :parent-index="index" :comp-label="content.label" :comp-id="content.id"></epsilon-toggle>
                     </template>
@@ -533,7 +538,6 @@ export const dashboardDemos: any = Vue.extend( {
   beforeMount: function() {
     const self = this;
     let temp: any, t1: any;
-
     this.checkAlreadyInstalled();
 
     let fetchObj: EpsilonFetchTranslator,

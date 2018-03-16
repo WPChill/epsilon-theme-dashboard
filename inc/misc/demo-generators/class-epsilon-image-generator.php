@@ -45,7 +45,7 @@ class Epsilon_Image_Generator {
 	 * @param array  $size
 	 * @param string $desc
 	 */
-	public function __construct( $post_id = null, $size = array(), $desc = '', $options = array() ) {
+	public function __construct( $post_id = null, $size = array(), $desc = '', $options = '' ) {
 		$this->load_dependencies();
 
 		$this->post_id = $post_id;
@@ -54,7 +54,11 @@ class Epsilon_Image_Generator {
 
 		$this->options = $options;
 
-		$this->url = $this->generate_download_url();
+		if ( is_array( $options ) ) {
+			$this->url = $this->generate_download_url();
+		} else {
+			$this->url = $options;
+		}
 	}
 
 	/**

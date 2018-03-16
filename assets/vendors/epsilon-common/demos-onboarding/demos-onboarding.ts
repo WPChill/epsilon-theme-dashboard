@@ -100,7 +100,9 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
           next = now + 1;
 
       if ( ! this.demoImporter[ this.currentDemo ][ keys[ now ] ].status ) {
+        this.demoImporter[ this.currentDemo ][ keys[ now ] ].imported = 'skipped';
         this.startImporting( next );
+        return;
       }
 
       if ( typeof keys[ next ] === 'undefined' ) {
@@ -300,6 +302,9 @@ export const dashboardDemosOnboarding: any = Vue.extend( {
                   </template>
                   <template v-else-if="wasImported(index, content.id) == 'failed'">
                     <span class="dashicons dashicons-warning"></span> {{ content.label }}
+                  </template>
+                  <template v-else-if="wasImported(index, content.id) == 'skipped'">
+                    <span class="dashicons dashicons-sort"></span> {{ content.label }}
                   </template>
                   <template v-else>
                     <epsilon-toggle :parent-index="index" :comp-label="content.label" :comp-id="content.id"></epsilon-toggle>

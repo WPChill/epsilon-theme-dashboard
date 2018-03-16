@@ -38,6 +38,10 @@ class Epsilon_Import_Data {
 	 * @var null
 	 */
 	public $front_page = null;
+	/**
+	 * @var array
+	 */
+	public $uploaded = array();
 
 	/**
 	 * Epsilon_Import_Data constructor.
@@ -162,13 +166,19 @@ class Epsilon_Import_Data {
 		$this->demos = $arr;
 	}
 
-	public static function recurse_callback( &$item, $key ) {
+	/**
+	 * @param $item
+	 * @param $key
+	 */
+	public function recurse_callback( &$item, $key ) {
 		if ( $key === 'custom_logo' ) {
 			$item = get_template_directory_uri() . $item;
 		}
 
 		if ( false !== strpos( $key, '_image' ) || false !== strpos( $key, '_background' ) && false === strpos( $key, '_color' ) ) {
-			$item = get_template_directory_uri() . $item;
+			if ( ! strpos( $item, 'external' ) !== false ) {
+				$item = get_template_directory_uri() . $item;
+			}
 		}
 	}
 
@@ -236,18 +246,53 @@ class Epsilon_Import_Data {
 			return 'nok';
 		}
 
-		$class  = $this->demos[ $id ][ $type ]['content']['importer']['class'];
-		$method = $this->demos[ $id ][ $type ]['content']['importer']['method'];
-		$args   = array(
-			'post_count'     => $this->demos[ $id ][ $type ]['content']['post_count'],
-			'image_size'     => $this->demos[ $id ][ $type ]['content']['image_size'],
-			'image_category' => $this->demos[ $id ][ $type ]['content']['image_category'],
-		);
+		$class  = $this->check_importer( $this->demos[ $id ][ $type ]['content'], 'class' );
+		$method = $this->check_importer( $this->demos[ $id ][ $type ]['content'], 'method' );
+
+		$args = $this->post_defaults( $this->demos[ $id ][ $type ]['content'] );
 
 		$importer = new $class( $args );
 		$importer->$method();
 
 		return 'ok';
+	}
+
+	/**
+	 * @param $args
+	 * @param $key
+	 *
+	 * @return mixed
+	 */
+	public function check_importer( $args, $key ) {
+		$arr = array(
+			'class'  => 'Epsilon_Post_Generator',
+			'method' => 'add_posts',
+		);
+
+		if ( ! isset( $args['importer'] ) ) {
+			return $arr[ $key ];
+		}
+
+		$arr['class']  = isset( $args['importer']['class'] ) ? $args['importer']['class'] : 'Epsilon_Post_Generator';
+		$arr['method'] = isset( $args['importer']['method'] ) ? $args['importer']['method'] : 'add_posts';
+
+		return $arr[ $key ];
+	}
+
+	/**
+	 * @param $args
+	 *
+	 * @return array
+	 */
+	public function post_defaults( $args ) {
+		$defaults = array(
+			'post_count'      => 4,
+			'image_size'      => array(),
+			'image_category'  => array(),
+			'specific_images' => array(),
+		);
+
+		return wp_parse_args( $args, $defaults );
 	}
 
 	/**
@@ -266,7 +311,7 @@ class Epsilon_Import_Data {
 		$import  = array();
 		$setting = '';
 		foreach ( $this->demos[ $id ][ $type ]['content'] as $s_id => $values ) {
-			$import[] = $values['content'];
+			$import[] = $this->search_for_images_in_section( $values['content'] );
 			$setting  = $values['setting'];
 		}
 
@@ -301,7 +346,7 @@ class Epsilon_Import_Data {
 
 		$import = array();
 		foreach ( $this->demos[ $id ][ $type ]['content'] as $c_id ) {
-			$import[ $c_id['setting'] ] = $c_id['content'];
+			$import[ $c_id['setting'] ] = $this->search_for_images( $c_id['content'] );
 		}
 
 		/**
@@ -317,6 +362,62 @@ class Epsilon_Import_Data {
 		}
 
 		return 'ok';
+	}
+
+	/**
+	 * @param $content
+	 *
+	 * @return mixed
+	 */
+	public function search_for_images_in_section( $content ) {
+		foreach ( $content as $name => $value ) {
+			if ( is_array( $value ) ) {
+				continue;
+			}
+
+			if ( ! strpos( $value, 'external' ) !== false ) {
+				continue;
+			}
+
+			$parts = explode( '~', $value );
+			if ( ! empty( $parts[1] ) ) {
+				$generator = Epsilon_Static_Image_Generator::get_instance();
+				$generator->add_url( $parts[1] );
+
+				$content[ $name ] = $generator->get_image();
+			}
+		}
+
+		return $content;
+	}
+
+	/**
+	 * @param $content
+	 *
+	 * @return mixed
+	 */
+	public function search_for_images( $content ) {
+		foreach ( $content as $index => $block ) {
+			foreach ( $block as $name => $value ) {
+				if ( is_array( $value ) ) {
+					continue;
+				}
+
+				if ( ! strpos( $value, 'external' ) !== false ) {
+					continue;
+				}
+
+				$parts = explode( '~', $value );
+				if ( ! empty( $parts[1] ) ) {
+					$generator = Epsilon_Static_Image_Generator::get_instance();
+					$generator->add_url( $parts[1] );
+
+					$content[ $index ][ $name ] = $generator->get_image();
+				}
+			}
+		}
+
+		return $content;
 	}
 
 	/**
