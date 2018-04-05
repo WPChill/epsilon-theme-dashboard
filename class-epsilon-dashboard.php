@@ -155,6 +155,10 @@ class Epsilon_Dashboard {
 		 * Initiate customer tracking
 		 */
 		$this->init_tracking();
+		/**
+		 * Initiate uninstall feedback
+		 */
+		$this->init_uninstall_feedback();
 	}
 
 	/**
@@ -255,5 +259,16 @@ class Epsilon_Dashboard {
 				'tracking_option' => $this->tracking,
 			)
 		);
+	}
+
+	/**
+	 * If user navigates to themes repo, show him a notice
+	 */
+	public function init_uninstall_feedback() {
+		global $pagenow;
+
+		if ( 'themes.php' === $pagenow ) {
+			new Epsilon_Uninstall_Feedback( $this->theme );
+		}
 	}
 }

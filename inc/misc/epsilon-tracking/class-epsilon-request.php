@@ -143,4 +143,28 @@ class Epsilon_Request {
 	private function _save_request_time() {
 		update_option( 'epsilon_customer_tracking_last_request', time() );
 	}
+
+	/**
+	 * @param array $args
+	 *
+	 * @return array|bool|WP_Error
+	 */
+	public static function send_manual_request( $args = array() ) {
+
+		$request = wp_remote_post( $args['url'], array(
+			'method'      => 'POST',
+			'timeout'     => 20,
+			'redirection' => 5,
+			'httpversion' => '1.1',
+			'blocking'    => true,
+			'body'        => $args['body'],
+			'user-agent'  => 'MT/EPSILON-CUSTOMER-TRACKING/' . esc_url( home_url() )
+		) );
+
+		if ( is_wp_error( $request ) ) {
+			return $request;
+		}
+
+		return true;
+	}
 }
