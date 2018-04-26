@@ -170,7 +170,7 @@ export const dashboardDemos: any = Vue.extend( {
           args: {
             id: this.availableDemos[ demoIndex ].id,
             content: temp,
-            path: this.path,
+            path: this.path.replace(/\\/g, '\\\\'),
           },
         },
       };
@@ -548,7 +548,7 @@ export const dashboardDemos: any = Vue.extend( {
             action: [ 'Epsilon_Dashboard_Helper', 'get_demos' ],
             nonce: this.$store.state.ajax_nonce,
             args: {
-              path: this.path,
+              path: this.path.replace(/\\/g, '\\\\'),
             },
           },
         };
