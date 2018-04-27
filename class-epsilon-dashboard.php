@@ -155,10 +155,11 @@ class Epsilon_Dashboard {
 		 * Initiate customer tracking
 		 */
 		$this->init_tracking();
+		
 		/**
 		 * Initiate uninstall feedback
+		 * $this->init_uninstall_feedback();
 		 */
-		$this->init_uninstall_feedback();
 	}
 
 	/**
