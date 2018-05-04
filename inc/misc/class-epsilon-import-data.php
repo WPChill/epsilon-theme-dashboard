@@ -79,6 +79,7 @@ class Epsilon_Import_Data {
 	 * @return void
 	 */
 	public function handle_json() {
+		/*
 		global $wp_filesystem;
 		if ( empty( $wp_filesystem ) ) {
 			require_once( ABSPATH . '/wp-admin/includes/file.php' );
@@ -86,6 +87,9 @@ class Epsilon_Import_Data {
 		}
 
 		$json = $wp_filesystem->get_contents( $this->path );
+		*/
+
+		$json = file_get_contents( $this->path );
 		$json = json_decode( $json, true );
 
 		if ( null === $json ) {
