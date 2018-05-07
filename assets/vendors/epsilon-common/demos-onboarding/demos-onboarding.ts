@@ -142,7 +142,7 @@ export const dashboardDemosOnboarding: any = Vue.extend({
                     args: {
                         id: this.availableDemos[demoIndex].id,
                         content: temp,
-                        path: this.path,
+                        path: this.path.replace(/\\/g, '\\\\'),
                     },
                 },
             };
