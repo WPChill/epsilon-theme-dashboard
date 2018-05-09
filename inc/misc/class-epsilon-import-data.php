@@ -175,15 +175,35 @@ class Epsilon_Import_Data {
 	 * @param $key
 	 */
 	public function recurse_callback( &$item, $key ) {
+
+		$exclude_background = apply_filters( 'epsilon_theme_dashboard_exclude_background_keys', array( '_color', '_video', '_position', '_size', '_repeat', '_parallax', '_video' ) );
+
 		if ( $key === 'custom_logo' ) {
 			$item = get_template_directory_uri() . $item;
 		}
 
-		if ( false !== strpos( $key, '_image' ) || false !== strpos( $key, '_background' ) && false === strpos( $key, '_color' ) ) {
+		if ( false !== strpos( $key, '_image' ) || false !== strpos( $key, '_background' ) && false === $this->strpos_recursive( $exclude_background, $key ) ) {
 			if ( ! strpos( $item, 'external' ) !== false ) {
 				$item = get_template_directory_uri() . $item;
 			}
 		}
+	}
+
+	/**
+	 * Find the position of the first occurrence of a substring in a string recursive
+	 *
+	 * @param array $needles
+	 * @param string $haystack
+	 *
+	 * @return boolean
+	 */
+	public function strpos_recursive( $needles, $haystack ) {
+	    foreach( $needles as $needle ){
+	        if ( strpos( $haystack, $needle ) !== false ) {
+	            return true;
+	        }
+	    }
+	    return false;
 	}
 
 	/**
