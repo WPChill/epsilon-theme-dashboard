@@ -14,14 +14,12 @@ class Epsilon_Dashboard_Ajax {
 	 * Epsilon_Onboarding_Ajax_Handler constructor.
 	 */
 	public function __construct() {
+
 		add_action( 'wp_ajax_epsilon_dashboard_ajax_callback', array(
 			$this,
 			'epsilon_dashboard_ajax_callback',
 		) );
-		add_action( 'wp_ajax_nopriv_epsilon_dashboard_ajax_callback', array(
-			$this,
-			'epsilon_dashboard_ajax_callback',
-		) );
+
 	}
 
 	/**
@@ -56,7 +54,7 @@ class Epsilon_Dashboard_Ajax {
 			);
 		}
 
-		if ( ! class_exists( $args_action[0] ) ) {
+		if ( ! class_exists( $args_action[0] ) || ! in_array( $args_action[0], array( 'Epsilon_Dashboard_Helper', 'EDD_Theme_Helper', 'Epsilon_Import_Data' ) ) ) {
 			wp_die(
 				wp_json_encode(
 					array(
