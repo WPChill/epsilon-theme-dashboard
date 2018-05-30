@@ -31,7 +31,6 @@ class Epsilon_Dashboard_Ajax {
 		if ( is_string( $_POST['args'] ) ) {
 			$_POST['args'] = json_decode( wp_unslash( $_POST['args'] ), true );
 		}
-
 		$this->_check_nonce();
 		$this->_check_user_role();
 		$args_action = array_map( 'sanitize_text_field', wp_unslash( $_POST['args']['action'] ) );
@@ -84,7 +83,7 @@ class Epsilon_Dashboard_Ajax {
 	 * @return bool
 	 */
 	private function _check_nonce() {
-		if ( isset( $_POST['args'], $_POST['args']['nonce'] ) && ! wp_verify_nonce( sanitize_key( $_POST['args']['nonce'] ), 'epsilon_nonce' ) ) {
+		if ( isset( $_POST['args'], $_POST['args']['nonce'] ) && ! wp_verify_nonce( sanitize_key( $_POST['args']['nonce'] ), 'epsilon_dashboard_nonce' ) ) {
 
 			$this->send_response(
 				array(
