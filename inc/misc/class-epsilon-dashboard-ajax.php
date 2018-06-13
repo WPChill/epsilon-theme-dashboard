@@ -18,6 +18,7 @@ class Epsilon_Dashboard_Ajax {
 			$this,
 			'epsilon_dashboard_ajax_callback',
 		) );
+		
 		add_action( 'wp_ajax_nopriv_epsilon_dashboard_ajax_callback', array(
 			$this,
 			'not_logged_notice',
