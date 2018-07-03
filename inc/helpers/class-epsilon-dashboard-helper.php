@@ -202,6 +202,24 @@ class Epsilon_Dashboard_Helper {
 	 * @return string;
 	 */
 	public static function set_user_meta( $args = array() ) {
+		/**
+		 * Denied metas
+		 *
+		 * @var array
+		 */
+		$denied = array(
+			'wp_capabilities',
+			'wp_user_level',
+			'nickname',
+			'first_name',
+			'last_name',
+			'description',
+		);
+
+		if ( in_array( $args['option'], $denied ) ) {
+			return 'nok';
+		}
+
 		update_user_meta( get_current_user_id(), $args['option'], absint( $args['tab'] ) );
 
 		return 'ok';

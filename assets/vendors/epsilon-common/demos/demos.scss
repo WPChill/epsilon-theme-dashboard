@@ -1,3 +1,12 @@
+#epsilon-demo.epsilon-dashboard-tab{
+  .demos-filtering {
+    margin-bottom: 20px;
+    border-bottom:none;
+    button {
+      margin-right: 5px;
+    }
+  }
+}
 #epsilon-demo.epsilon-dashboard-tab .row,
 #epsilon-demos .row {
   position: relative;
@@ -67,6 +76,10 @@
           &.dashicons-warning {
             color: #fff;
             background: #ff3d2e;
+          }
+          &.dashicons-sort {
+            color: #fff;
+            background: #f4a742;
           }
         }
       }

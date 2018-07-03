@@ -2,13 +2,14 @@ var path = require( 'path' );
 var webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const extractSass = new ExtractTextPlugin( {
-  filename: '../css/[name].css',
+  filename: '../css/[name].css'
 } );
 
 module.exports = {
   entry: {
     dashboard: './assets/vendors/epsilon-dashboard/dashboard.ts',
     onboarding: './assets/vendors/epsilon-onboarding/onboarding.ts',
+    feedback: './assets/vendors/epsilon-feedback/feedback.ts'
   },
   output: {
     path: path.resolve( __dirname, './assets/js/' ),

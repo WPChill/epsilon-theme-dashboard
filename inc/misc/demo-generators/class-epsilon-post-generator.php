@@ -13,6 +13,10 @@ class Epsilon_Post_Generator {
 	 * @var int
 	 */
 	public $posts = array();
+	/**
+	 * @var array
+	 */
+	public $specific_images = array();
 
 	/**
 	 * Epsilon_Post_Generator constructor.
@@ -21,12 +25,16 @@ class Epsilon_Post_Generator {
 	 */
 	public function __construct(
 		$posts = array(
-			'post_count'     => 4,
-			'image_size'     => array(),
-			'image_category' => array( 'dogs' )
+			'post_count'      => 4,
+			'image_size'      => array(),
+			'image_category'  => array( 'dogs' ),
+			'specific_images' => array(),
 		)
 	) {
 		$this->posts = $posts;
+		if ( ! empty( $this->posts['specific_images'] ) ) {
+			$this->specific_images = $this->posts['specific_images'];
+		}
 	}
 
 	/**
@@ -41,14 +49,23 @@ class Epsilon_Post_Generator {
 				$posts[] = $post;
 			}
 
-			$this->generate_image(
-				$post,
-				$this->posts['image_size'],
-				'',
-				array(
-					'category' => $this->posts['image_category'],
-				)
-			);
+
+			if ( empty( $this->specific_images ) ) {
+				$this->generate_image( $post,
+				                       $this->posts['image_size'],
+				                       '',
+				                       array(
+					                       'category' => $this->posts['image_category'],
+				                       ) );
+			} else {
+				$this->generate_specific_image(
+					$post,
+					$this->posts['image_size'],
+					'',
+					$this->specific_images[ $i ]
+				);
+			}
+
 		}
 
 		return true;
@@ -68,6 +85,17 @@ class Epsilon_Post_Generator {
 		);
 
 		return wp_insert_post( $post );
+	}
+
+	/**
+	 * @param        $post_id
+	 * @param array  $sizes
+	 * @param string $description
+	 * @param array  $options
+	 */
+	private function generate_specific_image( $post_id, $sizes = array(), $description = '', $options = array() ) {
+		$image = new Epsilon_Image_Generator( $post_id, $sizes, $description, $options );
+		$image->generate_featured_image();
 	}
 
 	/**

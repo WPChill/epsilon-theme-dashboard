@@ -1,2 +1,1 @@
-# epsilon-theme-dashboard
-Theme Dashboard VueJS
+# Epsilon Theme Dashboard

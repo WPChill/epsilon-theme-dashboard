@@ -38,6 +38,10 @@ class Epsilon_Import_Data {
 	 * @var null
 	 */
 	public $front_page = null;
+	/**
+	 * @var array
+	 */
+	public $uploaded = array();
 
 	/**
 	 * Epsilon_Import_Data constructor.
@@ -75,6 +79,7 @@ class Epsilon_Import_Data {
 	 * @return void
 	 */
 	public function handle_json() {
+		/*
 		global $wp_filesystem;
 		if ( empty( $wp_filesystem ) ) {
 			require_once( ABSPATH . '/wp-admin/includes/file.php' );
@@ -82,6 +87,9 @@ class Epsilon_Import_Data {
 		}
 
 		$json = $wp_filesystem->get_contents( $this->path );
+		*/
+
+		$json = file_get_contents( $this->path );
 		$json = json_decode( $json, true );
 
 		if ( null === $json ) {
@@ -100,10 +108,12 @@ class Epsilon_Import_Data {
 	 */
 	private function _parse_json_js( $json ) {
 		$arr = array();
+
 		foreach ( $json as $k => $v ) {
 			$arr[ $k ]['id']      = $k;
 			$arr[ $k ]['label']   = $v['label'];
 			$arr[ $k ]['thumb']   = get_template_directory_uri() . $v['thumb'];
+			$arr[ $k ]['tags']    = isset( $v['tag'] ) ? $v['tag'] : array();
 			$arr[ $k ]['content'] = array();
 
 			foreach ( $v as $key => $value ) {
@@ -111,6 +121,9 @@ class Epsilon_Import_Data {
 					continue;
 				}
 				if ( 'label' === $key ) {
+					continue;
+				}
+				if ( 'tag' === $key ) {
 					continue;
 				}
 
@@ -157,14 +170,40 @@ class Epsilon_Import_Data {
 		$this->demos = $arr;
 	}
 
-	public static function recurse_callback( &$item, $key ) {
+	/**
+	 * @param $item
+	 * @param $key
+	 */
+	public function recurse_callback( &$item, $key ) {
+
+		$exclude_background = apply_filters( 'epsilon_theme_dashboard_exclude_background_keys', array( '_color', '_video', '_position', '_size', '_repeat', '_parallax', '_video' ) );
+
 		if ( $key === 'custom_logo' ) {
 			$item = get_template_directory_uri() . $item;
 		}
 
-		if ( false !== strpos( $key, '_image' ) || false !== strpos( $key, '_background' ) && false === strpos( $key, '_color' ) ) {
-			$item = get_template_directory_uri() . $item;
+		if ( false !== strpos( $key, '_image' ) || false !== strpos( $key, '_background' ) && false === $this->strpos_recursive( $exclude_background, $key ) ) {
+			if ( ! strpos( $item, 'external' ) !== false ) {
+				$item = get_template_directory_uri() . $item;
+			}
 		}
+	}
+
+	/**
+	 * Find the position of the first occurrence of a substring in a string recursive
+	 *
+	 * @param array $needles
+	 * @param string $haystack
+	 *
+	 * @return boolean
+	 */
+	public function strpos_recursive( $needles, $haystack ) {
+	    foreach( $needles as $needle ){
+	        if ( strpos( $haystack, $needle ) !== false ) {
+	            return true;
+	        }
+	    }
+	    return false;
 	}
 
 	/**
@@ -231,18 +270,53 @@ class Epsilon_Import_Data {
 			return 'nok';
 		}
 
-		$class  = $this->demos[ $id ][ $type ]['content']['importer']['class'];
-		$method = $this->demos[ $id ][ $type ]['content']['importer']['method'];
-		$args   = array(
-			'post_count'     => $this->demos[ $id ][ $type ]['content']['post_count'],
-			'image_size'     => $this->demos[ $id ][ $type ]['content']['image_size'],
-			'image_category' => $this->demos[ $id ][ $type ]['content']['image_category'],
-		);
+		$class  = $this->check_importer( $this->demos[ $id ][ $type ]['content'], 'class' );
+		$method = $this->check_importer( $this->demos[ $id ][ $type ]['content'], 'method' );
+
+		$args = $this->post_defaults( $this->demos[ $id ][ $type ]['content'] );
 
 		$importer = new $class( $args );
 		$importer->$method();
 
 		return 'ok';
+	}
+
+	/**
+	 * @param $args
+	 * @param $key
+	 *
+	 * @return mixed
+	 */
+	public function check_importer( $args, $key ) {
+		$arr = array(
+			'class'  => 'Epsilon_Post_Generator',
+			'method' => 'add_posts',
+		);
+
+		if ( ! isset( $args['importer'] ) ) {
+			return $arr[ $key ];
+		}
+
+		$arr['class']  = isset( $args['importer']['class'] ) ? $args['importer']['class'] : 'Epsilon_Post_Generator';
+		$arr['method'] = isset( $args['importer']['method'] ) ? $args['importer']['method'] : 'add_posts';
+
+		return $arr[ $key ];
+	}
+
+	/**
+	 * @param $args
+	 *
+	 * @return array
+	 */
+	public function post_defaults( $args ) {
+		$defaults = array(
+			'post_count'      => 4,
+			'image_size'      => array(),
+			'image_category'  => array(),
+			'specific_images' => array(),
+		);
+
+		return wp_parse_args( $args, $defaults );
 	}
 
 	/**
@@ -261,7 +335,7 @@ class Epsilon_Import_Data {
 		$import  = array();
 		$setting = '';
 		foreach ( $this->demos[ $id ][ $type ]['content'] as $s_id => $values ) {
-			$import[] = $values['content'];
+			$import[] = $this->search_for_images_in_section( $values['content'] );
 			$setting  = $values['setting'];
 		}
 
@@ -296,7 +370,7 @@ class Epsilon_Import_Data {
 
 		$import = array();
 		foreach ( $this->demos[ $id ][ $type ]['content'] as $c_id ) {
-			$import[ $c_id['setting'] ] = $c_id['content'];
+			$import[ $c_id['setting'] ] = $this->search_for_images( $c_id['content'] );
 		}
 
 		/**
@@ -312,6 +386,62 @@ class Epsilon_Import_Data {
 		}
 
 		return 'ok';
+	}
+
+	/**
+	 * @param $content
+	 *
+	 * @return mixed
+	 */
+	public function search_for_images_in_section( $content ) {
+		foreach ( $content as $name => $value ) {
+			if ( is_array( $value ) ) {
+				continue;
+			}
+
+			if ( ! strpos( $value, 'external' ) !== false ) {
+				continue;
+			}
+
+			$parts = explode( '~', $value );
+			if ( ! empty( $parts[1] ) ) {
+				$generator = Epsilon_Static_Image_Generator::get_instance();
+				$generator->add_url( $parts[1] );
+
+				$content[ $name ] = $generator->get_image();
+			}
+		}
+
+		return $content;
+	}
+
+	/**
+	 * @param $content
+	 *
+	 * @return mixed
+	 */
+	public function search_for_images( $content ) {
+		foreach ( $content as $index => $block ) {
+			foreach ( $block as $name => $value ) {
+				if ( is_array( $value ) ) {
+					continue;
+				}
+
+				if ( ! strpos( $value, 'external' ) !== false ) {
+					continue;
+				}
+
+				$parts = explode( '~', $value );
+				if ( ! empty( $parts[1] ) ) {
+					$generator = Epsilon_Static_Image_Generator::get_instance();
+					$generator->add_url( $parts[1] );
+
+					$content[ $index ][ $name ] = $generator->get_image();
+				}
+			}
+		}
+
+		return $content;
 	}
 
 	/**
@@ -339,6 +469,16 @@ class Epsilon_Import_Data {
 						'menu-item-url'     => home_url( '/' ),
 						'menu-item-status'  => 'publish',
 					) );
+
+					$page_for_posts = get_option( 'page_for_posts', false );
+					if ( $page_for_posts ) {
+						wp_update_nav_menu_item( $menu_id, 0, array(
+							'menu-item-title'   => esc_html__( 'Blog', 'epsilon-framework' ),
+							'menu-item-classes' => 'blog',
+							'menu-item-url'     => home_url( '/?page_id=' . get_option( 'page_for_posts' ) ),
+							'menu-item-status'  => 'publish',
+						) );
+					}
 				}
 				$arr = $menu['menu'];
 				foreach ( $arr as $item ) {
@@ -473,6 +613,11 @@ class Epsilon_Import_Data {
 				continue;
 			}
 
+			if ( 'blogpage' === $k ) {
+				$this->check_blog_page();
+				continue;
+			}
+
 			$import[ $this->demos[ $id ][ $type ]['content'][ $k ]['setting'] ] = $this->demos[ $id ][ $type ]['content'][ $k ]['content'];
 
 		}
@@ -501,6 +646,27 @@ class Epsilon_Import_Data {
 			update_option( 'page_on_front', $id );
 		}
 		$this->front_page = get_option( 'page_on_front' );
+
+		return 'ok';
+	}
+
+	/**
+	 * Check if we have a blog page, if not add it
+	 */
+	public function check_blog_page() {
+		$front = get_option( 'show_on_front' );
+		if ( 'posts' === $front ) {
+			return 'ok';
+		}
+
+		$id = wp_insert_post(
+			array(
+				'post_title'  => __( 'Blog', 'epsilon-framework' ),
+				'post_type'   => 'page',
+				'post_status' => 'publish',
+			)
+		);
+		update_option( 'page_for_posts', $id );
 
 		return 'ok';
 	}

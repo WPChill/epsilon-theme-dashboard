@@ -138,7 +138,7 @@ class Epsilon_Dashboard {
 		 */
 		$this->init_dashboard();
 		/**
-		 * Do we have onboarding enabled?
+		 * Do we have on boarding enabled?
 		 */
 		if ( $this->onboarding ) {
 			$this->init_onboarding();
@@ -155,6 +155,11 @@ class Epsilon_Dashboard {
 		 * Initiate customer tracking
 		 */
 		$this->init_tracking();
+		
+		/**
+		 * Initiate uninstall feedback
+		 * $this->init_uninstall_feedback();
+		 */
 	}
 
 	/**
@@ -185,10 +190,16 @@ class Epsilon_Dashboard {
 			return;
 		}
 
+		/**
+		 * Is it valid?
+		 */
 		if ( empty( $licensing['licenseStatus'] ) || 'valid' !== $licensing['licenseStatus'] ) {
 			return;
 		}
 
+		/**
+		 * If we get here, we can instantiate the updater class
+		 */
 		$arr = array(
 			'license' => $licensing['licenseStatus'],
 		);
@@ -218,7 +229,7 @@ class Epsilon_Dashboard {
 	}
 
 	/**
-	 * Start onboarding process
+	 * Start on boarding process
 	 */
 	public function init_onboarding() {
 		$used_onboarding = get_theme_mod( get_stylesheet() . '_used_onboarding', false );
@@ -249,5 +260,16 @@ class Epsilon_Dashboard {
 				'tracking_option' => $this->tracking,
 			)
 		);
+	}
+
+	/**
+	 * If user navigates to themes repo, show him a notice
+	 */
+	public function init_uninstall_feedback() {
+		global $pagenow;
+
+		if ( 'themes.php' === $pagenow ) {
+			new Epsilon_Uninstall_Feedback( $this->theme );
+		}
 	}
 }
