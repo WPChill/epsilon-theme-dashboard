@@ -62,7 +62,7 @@ class Epsilon_Dashboard_Translations {
 	 */
 	public static function get_theme_array( $theme = array() ) {
 		$arr = array(
-			'logo'   => esc_url( get_template_directory_uri() . '/inc/libraries/epsilon-theme-dashboard/assets/images/macho-themes-logo.png' ),
+			'logo'   => esc_url( get_template_directory_uri() . '/inc/libraries/epsilon-theme-dashboard/assets/images/colorlib-logo-white.png' ),
 			/* Translators: Dashboard Header Title. */
 			'header' => sprintf( esc_html__( 'Welcome to %1$s - v', 'epsilon-framework' ), esc_html( $theme['theme-name'] ) ) . esc_html( $theme['theme-version'] ),
 			/* Translators: Dashboard Header Intro. */
