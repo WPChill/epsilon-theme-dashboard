@@ -10,7 +10,7 @@
     flex-wrap: wrap; }
     .epsilon-dashboard-tab .row .col {
       flex: 1;
-      min-width: 33%; }
+      min-width: 30%; }
   .epsilon-dashboard-tab .standout {
     border: 1px dashed #555;
     background: #fff;
