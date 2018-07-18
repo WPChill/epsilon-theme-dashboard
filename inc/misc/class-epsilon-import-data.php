@@ -676,6 +676,7 @@ class Epsilon_Import_Data {
 					'post_status' => 'publish',
 				)
 			);
+			update_post_meta( $id, 'epsilon_post_backed_up', true );
 			update_option( 'page_on_front', $id );
 		}
 		$this->front_page = get_option( 'page_on_front' );
@@ -699,6 +700,7 @@ class Epsilon_Import_Data {
 				'post_status' => 'publish',
 			)
 		);
+		update_post_meta( $id, 'epsilon_post_backed_up', true );
 		update_option( 'page_for_posts', $id );
 
 		return 'ok';
