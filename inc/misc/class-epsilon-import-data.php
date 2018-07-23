@@ -165,7 +165,6 @@ class Epsilon_Import_Data {
 	 * @param $key
 	 */
 	public function recurse_callback( &$item, $key ) {
-
 		$exclude_background = apply_filters( 'epsilon_theme_dashboard_exclude_background_keys', array(
 			'_color',
 			'_video',
@@ -177,6 +176,10 @@ class Epsilon_Import_Data {
 		) );
 
 		if ( $key === 'custom_logo' ) {
+			$item = get_template_directory_uri() . $item;
+		}
+
+		if ( $key === 'client_logo' ) {
 			$item = get_template_directory_uri() . $item;
 		}
 
