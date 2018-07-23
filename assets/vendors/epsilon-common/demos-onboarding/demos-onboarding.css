@@ -38,10 +38,15 @@
     #epsilon-demo.epsilon-dashboard-tab .row .epsilon-demo-box img,
     #epsilon-demos .row .epsilon-demo-box img {
       width: 100%;
-      display: block; }
+      display: block;
+      margin-top: 30px; }
     #epsilon-demo.epsilon-dashboard-tab .row .epsilon-demo-box .epsilon-demo-title,
     #epsilon-demos .row .epsilon-demo-box .epsilon-demo-title {
-      background: #888888;
+      background: #333;
+      position: absolute;
+      top: 0;
+      left: 0;
+      margin-bottom: 10px;
       color: #fff;
       display: block;
       width: 100%;
