@@ -79,16 +79,6 @@ class Epsilon_Import_Data {
 	 * @return void
 	 */
 	public function handle_json() {
-		/*
-		global $wp_filesystem;
-		if ( empty( $wp_filesystem ) ) {
-			require_once( ABSPATH . '/wp-admin/includes/file.php' );
-			WP_Filesystem();
-		}
-
-		$json = $wp_filesystem->get_contents( $this->path );
-		*/
-
 		$json = file_get_contents( $this->path );
 		$json = json_decode( $json, true );
 
@@ -175,10 +165,21 @@ class Epsilon_Import_Data {
 	 * @param $key
 	 */
 	public function recurse_callback( &$item, $key ) {
-
-		$exclude_background = apply_filters( 'epsilon_theme_dashboard_exclude_background_keys', array( '_color', '_video', '_position', '_size', '_repeat', '_parallax', '_video' ) );
+		$exclude_background = apply_filters( 'epsilon_theme_dashboard_exclude_background_keys', array(
+			'_color',
+			'_video',
+			'_position',
+			'_size',
+			'_repeat',
+			'_parallax',
+			'_video'
+		) );
 
 		if ( $key === 'custom_logo' ) {
+			$item = get_template_directory_uri() . $item;
+		}
+
+		if ( $key === 'client_logo' ) {
 			$item = get_template_directory_uri() . $item;
 		}
 
@@ -192,18 +193,19 @@ class Epsilon_Import_Data {
 	/**
 	 * Find the position of the first occurrence of a substring in a string recursive
 	 *
-	 * @param array $needles
+	 * @param array  $needles
 	 * @param string $haystack
 	 *
 	 * @return boolean
 	 */
 	public function strpos_recursive( $needles, $haystack ) {
-	    foreach( $needles as $needle ){
-	        if ( strpos( $haystack, $needle ) !== false ) {
-	            return true;
-	        }
-	    }
-	    return false;
+		foreach ( $needles as $needle ) {
+			if ( strpos( $haystack, $needle ) !== false ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -217,12 +219,13 @@ class Epsilon_Import_Data {
 		$content = array(
 			'id'      => 'standard',
 			'content' => array(
-				'menus'    => true,
-				'posts'    => true,
-				'options'  => true,
-				'widgets'  => true,
-				'content'  => true,
-				'sections' => true,
+				'menus'      => true,
+				'posts'      => true,
+				'options'    => true,
+				'widgets'    => true,
+				'content'    => true,
+				'sections'   => true,
+				'custom_css' => true,
 			)
 		);
 
@@ -494,6 +497,43 @@ class Epsilon_Import_Data {
 	}
 
 	/**
+	 * @param $id
+	 * @param $type
+	 *
+	 * @return string
+	 */
+	public function import_custom_css( $id, $type ) {
+		if ( empty( $this->demos[ $id ] ) || empty( $this->demos[ $id ][ $type ] ) ) {
+			return 'nok';
+		}
+
+		$theme = wp_get_theme();
+		$name  = $theme->get( 'TextDomain' );
+
+		$post_id = get_theme_mod( 'custom_css_post_id', 0 );
+
+		$post = wp_insert_post(
+			array(
+				'ID'           => $post_id,
+				'post_content' => $post_id ? get_post( $post_id )->post_content . "\n" . $this->demos[ $id ][ $type ]['content'] : $this->demos[ $id ][ $type ]['content'],
+				'post_title'   => $name,
+				'post_name'    => $name,
+				'post_status'  => 'publish',
+				'post_type'    => 'custom_css',
+			)
+		);
+
+
+		if ( is_int( $post ) ) {
+			set_theme_mod( 'custom_css_post_id', $post );
+
+			return 'ok';
+		}
+
+		return 'nok';
+	}
+
+	/**
 	 * Adds menu item
 	 *
 	 * @param $id
@@ -516,12 +556,10 @@ class Epsilon_Import_Data {
 	}
 
 	/**
-	 * Imports Widgets
-	 *
 	 * @param string $id
 	 * @param string $type
 	 *
-	 * @returns string;
+	 * @return string
 	 */
 	public function import_widgets( $id = '', $type = '' ) {
 		if ( empty( $this->demos[ $id ] ) || empty( $this->demos[ $id ][ $type ] ) ) {
@@ -589,12 +627,10 @@ class Epsilon_Import_Data {
 	}
 
 	/**
-	 * Imports Options
-	 *
 	 * @param string $id
 	 * @param string $type
 	 *
-	 * @returns string;
+	 * @return string
 	 */
 	public function import_options( $id = '', $type = '' ) {
 		if ( empty( $this->demos[ $id ] ) || empty( $this->demos[ $id ][ $type ] ) ) {
@@ -643,6 +679,7 @@ class Epsilon_Import_Data {
 					'post_status' => 'publish',
 				)
 			);
+			update_post_meta( $id, 'epsilon_post_backed_up', true );
 			update_option( 'page_on_front', $id );
 		}
 		$this->front_page = get_option( 'page_on_front' );
@@ -666,6 +703,7 @@ class Epsilon_Import_Data {
 				'post_status' => 'publish',
 			)
 		);
+		update_post_meta( $id, 'epsilon_post_backed_up', true );
 		update_option( 'page_for_posts', $id );
 
 		return 'ok';
