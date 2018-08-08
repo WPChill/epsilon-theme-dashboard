@@ -85,7 +85,7 @@ export const dashboardDemosOnboarding: any = Vue.extend({
             this.importing = true;
 
             for (let key in this.demoImporter[this.currentDemo]) {
-                this.demoImporter[this.currentDemo][key].imported = 'importing';
+                this.demoImporter[this.currentDemo][key].imported = 'queued';
             }
 
             this.startImporting(0);
@@ -130,8 +130,6 @@ export const dashboardDemosOnboarding: any = Vue.extend({
                     args: {},
                 };
 
-            this.demoImporter[demoIndex][contentId].imported = 'importing';
-
             temp[contentId] = self.demoImporter[demoIndex][contentId];
             data = {
                 action: 'epsilon_dashboard_ajax_callback',
@@ -147,6 +145,7 @@ export const dashboardDemosOnboarding: any = Vue.extend({
                 },
             };
 
+            this.demoImporter[demoIndex][contentId].imported = 'importing';
             fetchObj = new EpsilonFetchTranslator(data);
 
             fetch(ajaxurl, fetchObj).then(function (res) {
@@ -294,8 +293,11 @@ export const dashboardDemosOnboarding: any = Vue.extend({
               
               <ul class="epsilon-demo-box--advanced-list" v-if="index == currentDemo">
                 <li v-for="content in demo.content" :key="content.id">
-                  <template v-if="wasImported(index, content.id) == 'importing'">
-                    <span class="dashicons dashicons-update"></span> {{ content.label }}
+                  <template v-if="wasImported(index, content.id) == 'queued'">
+                    <span class="dashicons dashicons-share-alt"></span> {{ content.label }}
+                  </template>
+                  <template v-else-if="wasImported(index, content.id) == 'importing'">
+                    <span class="dashicons dashicons-update epsilon-spin"></span> {{ content.label }}
                   </template>
                   <template v-else-if="wasImported(index, content.id) == 'imported'">
                     <span class="dashicons dashicons-yes"></span> {{ content.label }}
