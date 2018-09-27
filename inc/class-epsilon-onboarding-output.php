@@ -133,6 +133,10 @@ class Epsilon_Onboarding_Output {
 				 */
 				'adminUrl'     => get_admin_url(),
 				/**
+				 * MachoThemes API
+				 */
+				'mtApiUrl'     => 'https://www.machothemes.com/wp-json/theme-demos-api/v1/demos/',
+				/**
 				 * Theme variables and usual translations
 				 */
 				'theme'        => Epsilon_Dashboard_Translations::get_theme_array( $this->theme ),

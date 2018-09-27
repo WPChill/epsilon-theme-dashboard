@@ -26,6 +26,7 @@ export const dashboardDemos: any = Vue.extend( {
       entrypoint: this.$store.state.entrypoint,
       translations: {
         contentImported: this.$store.state.translations.contentImported,
+        lastUpdateOnDemos: this.$store.state.translations.lastUpdateOnDemos,
         waitImport: this.$store.state.translations.waitImport,
         selectImport: this.$store.state.translations.selectImport,
         pluginsFinished: this.$store.state.translations.pluginsFinished,
@@ -37,6 +38,7 @@ export const dashboardDemos: any = Vue.extend( {
         waiting: this.$store.state.translations.waiting,
         completePlugin: this.$store.state.translations.completePlugin,
       },
+      MTApiUrl: this.$store.state.mtApiUrl,
       /**
        * Demo flags
        */
@@ -44,6 +46,7 @@ export const dashboardDemos: any = Vue.extend( {
       currentDemo: null,
       demoImporter: [],
       importing: false,
+      updatedDemo: null,
       /**
        * Tmp var
        */
@@ -170,10 +173,11 @@ export const dashboardDemos: any = Vue.extend( {
           args: {
             id: this.availableDemos[ demoIndex ].id,
             content: temp,
-            path: this.path.replace( /\\/g, '\\\\' ),
+            path: `${this.MTApiUrl}${this.availableDemos[ demoIndex ].id}`
           },
         },
       };
+
       self.demoImporter[ demoIndex ][ contentId ].imported = 'importing';
       fetchObj = new EpsilonFetchTranslator( data );
 
@@ -195,26 +199,12 @@ export const dashboardDemos: any = Vue.extend( {
      * @param {string} contentId
      */
     installPlugins( demoIndex: number, contentId: string ) {
-      const self = this;
-      let plugins;
+      this.plugins = this.availableDemos[ demoIndex ].content.plugins.additional;
+      this.pluginsCount = this.plugins.length;
 
-      if ( 'onboarding' === self.entrypoint ) {
-        return;
-      }
-
-      for ( let i = 0; i < this.availableDemos[ demoIndex ].content.length; i ++ ) {
-        if ( contentId === this.availableDemos[ demoIndex ].content[ i ].id ) {
-          self.plugins = this.availableDemos[ demoIndex ].content[ i ].additional;
-        }
-      }
-
-      self.plugins.map( function( element: { label: string, slug: string, installed: boolean, active: boolean } ) {
-        self.pluginsCount += 1;
-      } );
-
-      self.installerQueue = setInterval( function() {
-        self.plugins.map( function( element: { label: string, slug: string, installed: boolean, active: boolean } ) {
-          self._handlePlugin( demoIndex, contentId, element );
+      this.installerQueue = setInterval( () => {
+        this.plugins.map( ( element: { label: string, slug: string, installed: boolean, active: boolean } ) => {
+          this._handlePlugin( demoIndex, contentId, element );
         } );
       }, 1000 );
     },
@@ -228,13 +218,12 @@ export const dashboardDemos: any = Vue.extend( {
      * @private
      */
     _handlePlugin( demoIndex: number, contentId: string, element: { label: string, slug: string, installed: boolean, active: boolean } ) {
-      const self = this;
-      self.removeDupes( 'pluginsInstalled' );
-      if ( self.pluginsInstalled.length >= self.pluginsCount ) {
-        clearInterval( self.installerQueue );
-        self.installerQueue = null;
-        self.pluginsFinished = true;
-        self.startImporting( self.tmp );
+      this.removeDupes( 'pluginsInstalled' );
+      if ( this.pluginsInstalled.length >= this.pluginsCount ) {
+        clearInterval( this.installerQueue );
+        this.installerQueue = null;
+        this.pluginsFinished = true;
+        this.startImporting( this.tmp );
         return;
       }
 
@@ -252,8 +241,8 @@ export const dashboardDemos: any = Vue.extend( {
 
       this.pluginsInstalling = true;
 
-      jQuery( document ).on( 'wp-plugin-install-success', function( event: JQueryEventConstructor, response: any ) {
-        self._activatePlugin( response, demoIndex );
+      jQuery( document ).on( 'wp-plugin-install-success', ( event: JQueryEventConstructor, response: any ) => {
+        this._activatePlugin( response, demoIndex );
       } );
 
       /**
@@ -463,6 +452,9 @@ export const dashboardDemos: any = Vue.extend( {
    */
   template: `
     <div>
+      <span style="display:block">{{ translations.lastUpdateOnDemos }} - {{ updatedDemo }}</span>
+      <hr />
+    
       <nav class="demos-filtering" v-if="tags.length > 1">
           <button class="button button-primary" @click="filterDemos(null)">All</button>
           <button class="button button-primary" v-for="tag in tags" @click="filterDemos(tag)">{{ tag }}</button> 
@@ -478,7 +470,7 @@ export const dashboardDemos: any = Vue.extend( {
                 <p v-if="importing">{{ translations.waitImport }}</p>
                 <p v-else>{{ translations.selectImport }}</p>
               </template>
-              
+                            
               <ul class="epsilon-demo-box--advanced-list" v-if="index == currentDemo">
                 <li v-for="content in demo.content" :key="content.id">
                   <template v-if="content.id === 'plugins'">
@@ -539,7 +531,6 @@ export const dashboardDemos: any = Vue.extend( {
    * Before mount hook
    */
   beforeMount: function() {
-    const self = this;
     let temp: any, t1: any;
     this.checkAlreadyInstalled();
 
@@ -551,60 +542,61 @@ export const dashboardDemos: any = Vue.extend( {
             action: [ 'Epsilon_Dashboard_Helper', 'get_demos' ],
             nonce: this.$store.state.ajax_nonce,
             args: {
-              path: this.path.replace( /\\/g, '\\\\' ),
+              path: this.mtApiUrl,
             },
           },
         };
 
     fetchObj = new EpsilonFetchTranslator( data );
 
-    fetch( ajaxurl, fetchObj ).then( function( res ) {
+    fetch( ajaxurl, fetchObj ).then( ( res ) => {
       return res.json();
-    } ).then( function( json ) {
+    } ).then( ( json ) => {
       if ( 'ok' === json.status ) {
-        for ( let key in json.demos ) {
-          self.availableDemos.push( json.demos[ key ] );
+        this.updatedDemo = json.demos.updated;
+        _.each( json.demos.collection, ( e: any ) => {
+          /**
+           * Push each demo to the list of available
+           */
+          this.availableDemos.push( e );
+          /**
+           * Handle tags
+           */
+          e.tag.map( ( el: any ) => {
+            if ( ! _.contains( this.tags, el ) ) {
+              this.tags.push( el );
+            }
+          } );
+
+          /**
+           * Let demo importer know what it should import
+           */
           temp = {};
+          _.each( e.content, ( content: any, idx: any ) => {
+            temp[ idx ] = { key: idx, status: true, imported: false, url: e.url };
 
-          json.demos[ key ].tags.map( ( element: any ) => {
-            if ( ! _.contains( self.tags, element ) ) {
-              self.tags.push( element );
-            }
-
-          } );
-
-          json.demos[ key ].content.map( function( element: any ) {
-            temp[ element.id ] = { key: element.id, status: true, imported: false };
-          } );
-
-          self.demoImporter.push( temp );
-
-          for ( let i = 0; i < json.demos[ key ].content.length; i ++ ) {
-            if ( 'plugins' === json.demos[ key ].content[ i ].id ) {
+            if ( idx === 'plugins' ) {
               t1 = {};
-              for ( let j = 0; j < json.demos[ key ].content[ i ].additional.length; j ++ ) {
-                t1[ json.demos[ key ].content[ i ].additional[ j ].slug ] = self.translations.waiting;
+              _.each( content.additional, ( plugin: any ) => {
+                t1[ plugin.slug ] = this.translations.waiting;
 
-                if ( json.demos[ key ].content[ i ].additional[ j ].active ) {
-                  self.pluginsInstalled.push( json.demos[ key ].content[ i ].additional[ j ].slug );
-                  t1[ json.demos[ key ].content[ i ].additional[ j ].slug ] = self.translations.completePlugin;
+                if ( plugin.active ) {
+                  this.pluginsInstalled.push( plugin.slug );
+                  t1[ plugin.slug ] = this.translations.completePlugin;
                 }
-              }
-              self.pluginAction.push( t1 );
+              } );
+
+              this.pluginAction.push( t1 );
             }
-          }
-        }
+          } );
 
-        self.removeDupes( 'pluginsInstalled' );
-        /**
-         * Remove plugins if we`re in onboarding
-         */
-        if ( 'onboarding' === self.entrypoint ) {
-          self.removePlugins();
-        }
+          this.demoImporter.push( temp );
+        } );
 
-        if ( self.availableDemos.length === 1 ) {
-          self.selectDemo( 0 );
+        this.removeDupes( 'pluginsInstalled' );
+
+        if ( this.availableDemos.length === 1 ) {
+          this.selectDemo( 0 );
         }
       }
     } );

@@ -23,6 +23,7 @@ class Epsilon_Dashboard_Translations {
 			'selectImport'           => esc_html__( 'Select what you want to install', 'epsilon-framework' ),
 			'waitImport'             => esc_html__( 'Please wait while we’re installing!', 'epsilon-framework' ),
 			'contentImported'        => esc_html__( 'Content imported!', 'epsilon-framework' ),
+			'lastUpdateOnDemos'      => esc_html__( 'Updated collection on ', 'epsilon-framework' ),
 			'waiting'                => esc_html__( 'Waiting', 'epsilon-framework' ),
 			'installing'             => esc_html__( 'Installing', 'epsilon-framework' ),
 			'activating'             => esc_html__( 'Activating', 'epsilon-framework' ),

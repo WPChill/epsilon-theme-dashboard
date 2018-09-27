@@ -72,7 +72,7 @@ class Epsilon_Static_Image_Generator {
 
 		$tmp  = download_url( $this->url );
 		$file = array(
-			'name'     => basename( 'unsplash-image-' . rand( 1, 123123123 ) ) . '.jpg',
+			'name'     => basename( 'mt-image-' . rand( 1, 123123123 ) ) . '.jpg',
 			'tmp_name' => $tmp,
 		);
 		if ( is_wp_error( $tmp ) ) {
@@ -81,7 +81,7 @@ class Epsilon_Static_Image_Generator {
 			return $tmp;
 		}
 
-		$id = media_handle_sideload( $file, 0, 'Image downloaded from unsplash' );
+		$id = media_handle_sideload( $file, 0, 'Image downloaded from importer' );
 		if ( is_wp_error( $id ) ) {
 			unlink( $file['tmp_name'] );
 
@@ -89,7 +89,6 @@ class Epsilon_Static_Image_Generator {
 		}
 
 		$this->uploaded[ $this->url ] = wp_get_attachment_url( $id );
-
 		set_transient( $this->option, $this->uploaded, strtotime( '+5 minutes' ) );
 
 		return $this->uploaded[ $this->url ];

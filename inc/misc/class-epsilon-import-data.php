@@ -15,12 +15,6 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Epsilon_Import_Data {
 	/**
-	 * Available demos
-	 *
-	 * @var array
-	 */
-	public $demos = array();
-	/**
 	 * JS Demos ( for template )
 	 *
 	 * @var array
@@ -42,6 +36,11 @@ class Epsilon_Import_Data {
 	 * @var array
 	 */
 	public $uploaded = array();
+
+	/**
+	 * @var null
+	 */
+	public $content_json = 'empty';
 
 	/**
 	 * Epsilon_Import_Data constructor.
@@ -81,12 +80,10 @@ class Epsilon_Import_Data {
 	public function handle_json() {
 		$json = file_get_contents( $this->path );
 		$json = json_decode( $json, true );
-
 		if ( null === $json ) {
 			return;
 		}
 
-		$this->_parse_json( $json );
 		$this->_parse_json_js( $json );
 	}
 
@@ -97,115 +94,18 @@ class Epsilon_Import_Data {
 	 *
 	 */
 	private function _parse_json_js( $json ) {
-		$arr = array();
-
-		foreach ( $json as $k => $v ) {
-			$arr[ $k ]['id']      = $k;
-			$arr[ $k ]['label']   = $v['label'];
-			$arr[ $k ]['thumb']   = get_template_directory_uri() . $v['thumb'];
-			$arr[ $k ]['tags']    = isset( $v['tag'] ) ? $v['tag'] : array();
-			$arr[ $k ]['content'] = array();
-
-			foreach ( $v as $key => $value ) {
-				if ( 'thumb' === $key ) {
-					continue;
-				}
-				if ( 'label' === $key ) {
-					continue;
-				}
-				if ( 'tag' === $key ) {
-					continue;
-				}
-
-				$additional = array();
+		foreach ( $json['collection'] as $k => &$v ) {
+			foreach ( $v['content'] as $key => &$value ) {
 				if ( 'plugins' === $key ) {
-					foreach ( $value['content'] as $slug => $label ) {
-						$additional[] = array(
-							'label'     => $label,
-							'slug'      => $slug,
-							'installed' => Epsilon_Notify_System::check_plugin_is_installed( $slug ),
-							'active'    => Epsilon_Notify_System::check_plugin_is_active( $slug ),
-						);
-
+					foreach ( $value['additional'] as $index => &$plugin ) {
+						$plugin['installed'] = Epsilon_Notify_System::check_plugin_is_installed( $plugin['slug'] );
+						$plugin['active']    = Epsilon_Notify_System::check_plugin_is_active( $plugin['slug'] );
 					}
 				}
-
-				$arr[ $k ]['content'][] = array(
-					'label'      => $value['label'],
-					'id'         => $key,
-					'additional' => $additional,
-				);
 			}
 		}
 
-		$this->demos_js = $arr;
-	}
-
-	/**
-	 * Parses a json
-	 *
-	 * @param $json
-	 *
-	 * @returns void
-	 */
-	private function _parse_json( $json ) {
-		$arr = array();
-		foreach ( $json as $k => $v ) {
-			$arr[ $k ]          = $v;
-			$arr[ $k ]['id']    = $k;
-			$arr[ $k ]['thumb'] = get_template_directory_uri() . $v['thumb'];
-		}
-
-		array_walk_recursive( $arr, array( $this, 'recurse_callback' ) );
-		$this->demos = $arr;
-	}
-
-	/**
-	 * @param $item
-	 * @param $key
-	 */
-	public function recurse_callback( &$item, $key ) {
-		$exclude_background = apply_filters( 'epsilon_theme_dashboard_exclude_background_keys', array(
-			'_color',
-			'_video',
-			'_position',
-			'_size',
-			'_repeat',
-			'_parallax',
-			'_video'
-		) );
-
-		if ( $key === 'custom_logo' ) {
-			$item = get_template_directory_uri() . $item;
-		}
-
-		if ( $key === 'client_logo' ) {
-			$item = get_template_directory_uri() . $item;
-		}
-
-		if ( false !== strpos( $key, '_image' ) || false !== strpos( $key, '_background' ) && false === $this->strpos_recursive( $exclude_background, $key ) ) {
-			if ( ! strpos( $item, 'external' ) !== false ) {
-				$item = get_template_directory_uri() . $item;
-			}
-		}
-	}
-
-	/**
-	 * Find the position of the first occurrence of a substring in a string recursive
-	 *
-	 * @param array  $needles
-	 * @param string $haystack
-	 *
-	 * @return boolean
-	 */
-	public function strpos_recursive( $needles, $haystack ) {
-		foreach ( $needles as $needle ) {
-			if ( strpos( $haystack, $needle ) !== false ) {
-				return true;
-			}
-		}
-
-		return false;
+		$this->demos_js = $json;
 	}
 
 	/**
@@ -246,19 +146,25 @@ class Epsilon_Import_Data {
 	 */
 	public static function import_selective_data( $args = array() ) {
 		$instance = self::get_instance();
-
-		$instance->path = get_template_directory() . '/inc/libraries/epsilon-theme-dashboard/assets/data/demo.json';
-		if ( ! empty( $args ) && ! empty( $args['path'] ) && file_exists( $args['path'] ) ) {
-			$instance->path = $args['path'];
+		$status   = 'nok';
+		if ( empty( $args['path'] ) ) {
+			return $status;
 		}
 
-		$instance->handle_json();
+		if ( $instance->content_json === 'empty' ) {
+			$json                   = file_get_contents( $args['path'] );
+			$json                   = json_decode( $json, true );
+			$instance->content_json = $json;
+		}
 
-		$status = 'nok';
+		if ( $instance->content_json === null ) {
+			return $status;
+		}
+
 		foreach ( $args['content'] as $type => $value ) {
 			if ( method_exists( $instance, 'import_' . $type ) ) {
 				$method = 'import_' . $type;
-				$status = $instance->$method( $args['id'], $type );
+				$status = $instance->$method( $type );
 			}
 		}
 
@@ -266,17 +172,54 @@ class Epsilon_Import_Data {
 	}
 
 	/**
-	 * Import sections
+	 * @param string $type
+	 *
+	 * @return string
 	 */
-	public function import_posts( $id = '', $type = '' ) {
-		if ( empty( $this->demos[ $id ] ) || empty( $this->demos[ $id ][ $type ] ) ) {
+	public function import_options( $type = '' ) {
+		if ( empty( $this->content_json[ $type ] ) ) {
 			return 'nok';
 		}
 
-		$class  = $this->check_importer( $this->demos[ $id ][ $type ]['content'], 'class' );
-		$method = $this->check_importer( $this->demos[ $id ][ $type ]['content'], 'method' );
+		$import = array();
+		foreach ( $this->content_json[ $type ]['content'] as $k => $v ) {
+			if ( 'frontpage' === $k ) {
+				$this->check_static_page();
+				continue;
+			}
 
-		$args = $this->post_defaults( $this->demos[ $id ][ $type ]['content'] );
+			if ( 'logo' === $k ) {
+				$this->upload_logo( $this->content_json[ $type ]['content'][ $k ]['content'] );
+				continue;
+			}
+
+			if ( 'blogpage' === $k ) {
+				$this->check_blog_page();
+				continue;
+			}
+
+			$import[ $this->content_json[ $type ]['content'][ $k ]['setting'] ] = $this->content_json[ $type ]['content'][ $k ]['content'];
+		}
+
+		foreach ( $import as $k => $v ) {
+			set_theme_mod( $k, $v );
+		}
+
+		return 'ok';
+	}
+
+	/**
+	 * Import sections
+	 */
+	public function import_posts( $type = '' ) {
+		if ( empty( $this->content_json[ $type ] ) ) {
+			return 'nok';
+		}
+
+		$class  = $this->check_importer( $this->content_json[ $type ]['content'], 'class' );
+		$method = $this->check_importer( $this->content_json[ $type ]['content'], 'method' );
+
+		$args = $this->post_defaults( $this->content_json[ $type ]['content'] );
 
 		$importer = new $class( $args );
 		$importer->$method();
@@ -323,21 +266,20 @@ class Epsilon_Import_Data {
 	}
 
 	/**
-	 * Imports Menus
+	 * Imports sections
 	 *
-	 * @param string $id
 	 * @param string $type
 	 *
-	 * @returns string;
+	 * @return string;
 	 */
-	public function import_sections( $id = '', $type = '' ) {
-		if ( empty( $this->demos[ $id ] ) || empty( $this->demos[ $id ][ $type ] ) ) {
+	public function import_sections( $type = '' ) {
+		if ( empty( $this->content_json[ $type ] ) ) {
 			return 'nok';
 		}
 
 		$import  = array();
 		$setting = '';
-		foreach ( $this->demos[ $id ][ $type ]['content'] as $s_id => $values ) {
+		foreach ( $this->content_json[ $type ]['content'] as $s_id => $values ) {
 			$import[] = $this->search_for_images_in_section( $values['content'] );
 			$setting  = $values['setting'];
 		}
@@ -361,18 +303,17 @@ class Epsilon_Import_Data {
 	/**
 	 * Import content
 	 *
-	 * @param string $id
 	 * @param string $type
 	 *
 	 * @return string
 	 */
-	public function import_content( $id = '', $type = '' ) {
-		if ( empty( $this->demos[ $id ] ) || empty( $this->demos[ $id ][ $type ] ) ) {
+	public function import_content( $type = '' ) {
+		if ( empty( $this->content_json[ $type ] ) ) {
 			return 'nok';
 		}
 
 		$import = array();
-		foreach ( $this->demos[ $id ][ $type ]['content'] as $c_id ) {
+		foreach ( $this->content_json[ $type ]['content'] as $c_id ) {
 			$import[ $c_id['setting'] ] = $this->search_for_images( $c_id['content'] );
 		}
 
@@ -402,15 +343,9 @@ class Epsilon_Import_Data {
 				continue;
 			}
 
-			if ( ! strpos( $value, 'external' ) !== false ) {
-				continue;
-			}
-
-			$parts = explode( '~', $value );
-			if ( ! empty( $parts[1] ) ) {
+			if ( strpos( $value, 's3.amazonaws.com' ) !== false ) {
 				$generator = Epsilon_Static_Image_Generator::get_instance();
-				$generator->add_url( $parts[1] );
-
+				$generator->add_url( $value );
 				$content[ $name ] = $generator->get_image();
 			}
 		}
@@ -430,15 +365,9 @@ class Epsilon_Import_Data {
 					continue;
 				}
 
-				if ( ! strpos( $value, 'external' ) !== false ) {
-					continue;
-				}
-
-				$parts = explode( '~', $value );
-				if ( ! empty( $parts[1] ) ) {
+				if ( strpos( $value, 's3.amazonaws.com' ) !== false ) {
 					$generator = Epsilon_Static_Image_Generator::get_instance();
-					$generator->add_url( $parts[1] );
-
+					$generator->add_url( $value );
 					$content[ $index ][ $name ] = $generator->get_image();
 				}
 			}
@@ -450,17 +379,16 @@ class Epsilon_Import_Data {
 	/**
 	 * Imports Menus
 	 *
-	 * @param string $id
 	 * @param string $type
 	 *
-	 * @returns string;
+	 * @return string;
 	 */
-	public function import_menus( $id = '', $type = '' ) {
-		if ( empty( $this->demos[ $id ] ) || empty( $this->demos[ $id ][ $type ] ) ) {
+	public function import_menus( $type = '' ) {
+		if ( empty( $this->content_json[ $type ] ) ) {
 			return 'nok';
 		}
 
-		$ref = $this->demos[ $id ][ $type ]['content'];
+		$ref = $this->content_json[ $type ]['content'];
 		foreach ( $ref as $menu ) {
 			$menu_exists = wp_get_nav_menu_object( $menu['label'] );
 			if ( ! $menu_exists ) {
@@ -502,9 +430,13 @@ class Epsilon_Import_Data {
 	 *
 	 * @return string
 	 */
-	public function import_custom_css( $id, $type ) {
-		if ( empty( $this->demos[ $id ] ) || empty( $this->demos[ $id ][ $type ] ) ) {
+	public function import_custom_css( $type ) {
+		if ( empty( $this->content_json[ $type ] ) ) {
 			return 'nok';
+		}
+
+		if ( empty( $this->content_json[ $type ]['content'] ) ) {
+			return 'ok';
 		}
 
 		$theme = wp_get_theme();
@@ -515,7 +447,7 @@ class Epsilon_Import_Data {
 		$post = wp_insert_post(
 			array(
 				'ID'           => $post_id,
-				'post_content' => $post_id ? get_post( $post_id )->post_content . "\n" . $this->demos[ $id ][ $type ]['content'] : $this->demos[ $id ][ $type ]['content'],
+				'post_content' => $post_id ? get_post( $post_id )->post_content . "\n" . $this->content_json[ $type ]['content'] : $this->content_json[ $type ]['content'],
 				'post_title'   => $name,
 				'post_name'    => $name,
 				'post_status'  => 'publish',
@@ -561,13 +493,13 @@ class Epsilon_Import_Data {
 	 *
 	 * @return string
 	 */
-	public function import_widgets( $id = '', $type = '' ) {
-		if ( empty( $this->demos[ $id ] ) || empty( $this->demos[ $id ][ $type ] ) ) {
+	public function import_widgets( $type = '' ) {
+		if ( empty( $this->content_json[ $type ] ) ) {
 			return 'nok';
 		}
 
 		global $wp_registered_sidebars;
-		foreach ( $this->demos[ $id ][ $type ]['content'] as $sidebar => $widgets ) {
+		foreach ( $this->content_json[ $type ]['content'] as $sidebar => $widgets ) {
 			foreach ( $widgets as $widget => $props ) {
 				$widget_type = preg_replace( '/-[0-9]+$/', '', $widget );
 				$widget_id   = str_replace( $widget_type . '-', '', $widget );
@@ -590,7 +522,7 @@ class Epsilon_Import_Data {
 
 				$widget_instance   = get_option( 'widget_' . $widget_type );
 				$widget_instance   = ! empty( $widget_instance ) ? $widget_instance : $temp;
-				$widget_instance[] = $this->demos[ $id ][ $type ]['content'][ $sidebar ][ $widget ];
+				$widget_instance[] = $this->content_json[ $type ]['content'][ $sidebar ][ $widget ];
 
 				// Get the key it was given.
 				end( $widget_instance );
@@ -624,45 +556,6 @@ class Epsilon_Import_Data {
 		}// End foreach().
 		return 'ok';
 
-	}
-
-	/**
-	 * @param string $id
-	 * @param string $type
-	 *
-	 * @return string
-	 */
-	public function import_options( $id = '', $type = '' ) {
-		if ( empty( $this->demos[ $id ] ) || empty( $this->demos[ $id ][ $type ] ) ) {
-			return 'nok';
-		}
-
-		$import = array();
-		foreach ( $this->demos[ $id ][ $type ]['content'] as $k => $v ) {
-			if ( 'frontpage' === $k ) {
-				$this->check_static_page();
-				continue;
-			}
-
-			if ( 'logo' === $k ) {
-				$this->upload_logo( $this->demos[ $id ][ $type ]['content'][ $k ]['content'] );
-				continue;
-			}
-
-			if ( 'blogpage' === $k ) {
-				$this->check_blog_page();
-				continue;
-			}
-
-			$import[ $this->demos[ $id ][ $type ]['content'][ $k ]['setting'] ] = $this->demos[ $id ][ $type ]['content'][ $k ]['content'];
-
-		}
-
-		foreach ( $import as $k => $v ) {
-			set_theme_mod( $k, $v );
-		}
-
-		return 'ok';
 	}
 
 	/**

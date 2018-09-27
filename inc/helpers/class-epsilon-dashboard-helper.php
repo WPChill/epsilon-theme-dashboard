@@ -165,8 +165,8 @@ class Epsilon_Dashboard_Helper {
 	 * @return array
 	 */
 	public static function get_demos( $args = array() ) {
-		$path = get_template_directory() . '/inc/libraries/epsilon-theme-dashboard/assets/data/demo.json';
-		if ( ! empty( $args ) && ! empty( $args['path'] ) && file_exists( $args['path'] ) ) {
+		$path = 'https://www.machothemes.com/wp-json/theme-demos-api/v1/demos/';
+		if ( ! empty( $args ) && ! empty( $args['path'] ) ) {
 			$path = $args['path'];
 		}
 
@@ -176,7 +176,7 @@ class Epsilon_Dashboard_Helper {
 			)
 		);
 
-		$importer->set_demos();
+		$importer->handle_json();
 
 		/**
 		 * In case the json could not be decoded, we return a new stdClass
