@@ -70,10 +70,6 @@ class Epsilon_Dashboard_Output {
 		/* Translators: Menu Title */
 		$title = sprintf( esc_html__( 'About %1$s', 'epsilon-framework' ), esc_html( $this->theme['theme-name'] ) );
 
-		if ( 0 < count( $this->actions ) ) {
-			$title .= '<span class="badge-action-count">' . absint( count( $this->actions ) ) . '</span>';
-		}
-
 		add_theme_page(
 			$this->theme['theme-name'],
 			$title,

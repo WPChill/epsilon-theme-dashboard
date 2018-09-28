@@ -78,8 +78,13 @@ class Epsilon_Import_Data {
 	 * @return void
 	 */
 	public function handle_json() {
-		$json = file_get_contents( $this->path );
-		$json = json_decode( $json, true );
+		$json = wp_remote_get( $this->path );
+		if ( is_wp_error( $json ) ) {
+			return;
+		}
+
+		$json = json_decode( $json['body'], true );
+
 		if ( null === $json ) {
 			return;
 		}
@@ -152,8 +157,11 @@ class Epsilon_Import_Data {
 		}
 
 		if ( $instance->content_json === 'empty' ) {
-			$json                   = file_get_contents( $args['path'] );
-			$json                   = json_decode( $json, true );
+			$json = wp_remote_get( $args['path'] );
+			if ( is_wp_error( $json ) ) {
+				return $status;
+			}
+			$json                   = json_decode( $json['body'], true );
 			$instance->content_json = $json;
 		}
 
