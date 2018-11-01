@@ -57,12 +57,6 @@ class Epsilon_Dashboard {
 	 * @var bool
 	 */
 	protected $onboarding = true;
-	/**
-	 * Tracking
-	 *
-	 * @var bool
-	 */
-	protected $tracking = '';
 
 	/**
 	 * Class constructor
@@ -108,10 +102,6 @@ class Epsilon_Dashboard {
 					 * How many tabs do we have ?
 					 */
 					'tabs',
-					/**
-					 * Do we allow tracking ?
-					 */
-					'tracking'
 				)
 			)
 			) {

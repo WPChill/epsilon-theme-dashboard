@@ -111,7 +111,6 @@ export const onboardingStep: any = Vue.extend( {
 
       if ( 'customizer' === action ) {
         this.stepLoading = true;
-        this.$store.commit( 'setTrackingStatus', true );
         this.$store.commit( 'setOnboardingFlag', true );
 
         setTimeout( function() {
@@ -133,13 +132,5 @@ export const onboardingStep: any = Vue.extend( {
   created: function() {
     this.$root.$on( 'changed-step', this.stopLoading );
   },
-  mounted: function() {
-    this.$nextTick( function() {
-      jQuery( this.$el ).find( '#hidden-permissions-toggle' ).on( 'click', function( e: JQueryEventConstructor ) {
-        e.preventDefault();
-        jQuery( jQuery( this ).attr( 'href' ) ).slideToggle();
-      } );
-    } );
-  }
 } );
 Vue.component( 'onboarding-step', onboardingStep );
