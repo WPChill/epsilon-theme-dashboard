@@ -152,10 +152,6 @@ class Epsilon_Dashboard {
 		 */
 		$this->init_updater();
 		/**
-		 * Initiate customer tracking
-		 */
-		$this->init_tracking();
-		/**
 		 * Initiate uninstall feedback
 		 * $this->init_uninstall_feedback();
 		 */
@@ -248,17 +244,6 @@ class Epsilon_Dashboard {
 				)
 			);
 		}
-	}
-
-	/**
-	 * Initiate customer tracking ( CAN BE TOGGLED OFF )
-	 */
-	public function init_tracking() {
-		Epsilon_Customer_Tracking::get_instance(
-			array(
-				'tracking_option' => $this->tracking,
-			)
-		);
 	}
 
 	/**
