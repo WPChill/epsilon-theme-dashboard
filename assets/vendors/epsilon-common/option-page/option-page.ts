@@ -58,7 +58,7 @@ export const dashboardOptionPage: any = Vue.extend( {
       fetch( ajaxurl, fetchObj ).then( function( res ) {
         return res.json();
       } ).then( function( json ) {
-        self.$store.commit( 'updatePrivacyStatus', { id: args.id, status: args.status } );
+
       } );
 
     },

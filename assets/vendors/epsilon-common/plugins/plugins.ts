@@ -113,7 +113,7 @@ export const dashboardPlugins: any = Vue.extend( {
       const self = this;
       this.plugins[ index ].installing = true;
 
-      jQuery( document ).one( 'wp-plugin-install-success', function( event: JQueryEventConstructor, response: any ) {
+      jQuery( document ).one( 'wp-plugin-install-success', function( event: JQuery.Event, response: any ) {
         self.plugins[ index ].installed = true;
         self._activatePlugin( index, response );
       } );

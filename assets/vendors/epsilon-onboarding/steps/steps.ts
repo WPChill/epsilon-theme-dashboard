@@ -81,7 +81,7 @@ export const onboardingStep: any = Vue.extend( {
      * @param {number} index
      * @return
      */
-    changeStep: function( e: JQueryEventConstructor, action: string, index: number ) {
+    changeStep: function( e: JQuery.Event, action: string, index: number ) {
       const self = this;
       e.preventDefault();
 

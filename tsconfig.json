@@ -2,12 +2,12 @@
   "compilerOptions": {
     "outDir": "./built/",
     "sourceMap": false,
-    "strict": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": false,
-    "module": "es2015",
+    "strict": false,
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "module": "commonjs",
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "ES5",
     "typeRoots": [
       "node_modules/@types"
     ],

@@ -77,17 +77,6 @@ export const mutations = {
     state.edd.status = value;
   },
   /**
-   * Updates privacy status
-   *
-   * @param state
-   * @param args
-   */
-  updatePrivacyStatus( state: any, args: { id: string, status: boolean } ) {
-    if ( 'undefined' !== typeof state.privacy[ args.id ] ) {
-      state.privacy[ args.id ] = args.status;
-    }
-  },
-  /**
    * Sets imported flag
    * @param state
    * @param {boolean} change

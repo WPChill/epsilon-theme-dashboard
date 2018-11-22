@@ -177,7 +177,7 @@ export const dashboardPluginsQueue: any = Vue.extend( {
 
       this.pluginsInstalling = true;
 
-      jQuery( document ).on( 'wp-plugin-install-success', function( event: JQueryEventConstructor, response: any ) {
+      jQuery( document ).on( 'wp-plugin-install-success', function( event: JQuery.Event, response: any ) {
         self._activatePlugin( index, response );
       } );
 

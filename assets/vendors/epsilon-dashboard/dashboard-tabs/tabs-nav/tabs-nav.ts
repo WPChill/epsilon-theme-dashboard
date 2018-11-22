@@ -36,7 +36,7 @@ export const dashboardTabsNav: any = Vue.extend( {
   template: `
     <nav>
         <template v-for="(tab, index) in tabs">
-            <a v-if="hiddenTab(tab.hidden)" :href="'#' + tab.id" :class="{ active: index === activeTab }" @click="changeTab($event, index)">{{ tab.title }}</a>
+            <a :href="'#' + tab.id" :class="{ active: index === activeTab }" @click="changeTab($event, index)">{{ tab.title }}</a>
         </template>
     </nav>
   `,
@@ -44,16 +44,6 @@ export const dashboardTabsNav: any = Vue.extend( {
    * Methods
    */
   methods: {
-    /**
-     * Hidden tab ?
-     */
-    hiddenTab: function( visibility: boolean | string ) {
-      if ( ! visibility ) {
-        return true;
-      }
-
-      return ! this.$store.getters.getFieldRelation( visibility );
-    },
     /**
      * Send event to component
      * @param {Event} event

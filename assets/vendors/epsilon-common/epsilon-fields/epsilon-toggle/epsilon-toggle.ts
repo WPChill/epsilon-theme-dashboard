@@ -23,7 +23,7 @@ export const epsilonToggle: any = Vue.extend( {
     active: {
       get() {
         if ( 'string' === typeof this.relation ) {
-          return this.$store.getters.getFieldRelation( this.compId );
+          // return this.$store.getters.getFieldRelation( this.compId );
         }
 
         return true;
