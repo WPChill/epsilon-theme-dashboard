@@ -12,7 +12,7 @@
     flex-wrap: wrap;
     .col {
       flex: 1;
-      min-width: 30%;
+	  min-width: 30%;
     }
   }
 
@@ -24,4 +24,21 @@
     text-align: center;
     margin-top: 15px;
   }
+}
+
+#epsilon-getting-started {
+
+	.col {
+		text-align: center;
+		padding: 30px 15px;
+		background-color: #fafafa;
+		border: 1px solid #dddddd;
+		min-width: auto;
+		margin-left: 6px;
+		margin-right: 6px;
+
+		&:first-child { margin-left: 0px; }
+		&:last-child { margin-right: 0px; }
+	}
+
 }
