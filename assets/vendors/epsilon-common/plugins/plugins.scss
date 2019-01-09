@@ -5,10 +5,11 @@
   background: #FFF;
   position: relative;
   border: 1px solid rgba(0, 0, 0, .1);
-  margin-right: 5%;
-  &:last-of-type {
-    margin-right: 0;
-  }
+  margin-left: 6px;
+  margin-right: 6px;
+  &:nth-child(3n+1) {  margin-left: 0px;  }
+  &:nth-child(3n) {  margin-right: 0px; }
+
   img {
     width: 155px;
     height: 155px;
